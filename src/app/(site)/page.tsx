@@ -1,5 +1,5 @@
 import { requireCurrentRestaurant, getBaseUrl } from "@/lib/get-current-restaurant";
-import { getMenu, getOpeningHours } from "@/lib/get-menu";
+import { getMenu, getOpeningHours, getClosures } from "@/lib/get-menu";
 import { getLayoutPreset } from "@/lib/layout-presets";
 import { buildRestaurantJsonLd } from "@/lib/seo";
 import { Hero } from "@/components/site/Hero";
@@ -13,9 +13,10 @@ export default async function HomePage() {
   const restaurant = await requireCurrentRestaurant();
   const preset = getLayoutPreset(restaurant.theme.layout_style);
 
-  const [{ categories }, hours, baseUrl] = await Promise.all([
+  const [{ categories }, hours, closures, baseUrl] = await Promise.all([
     getMenu(restaurant.id),
     getOpeningHours(restaurant.id),
+    getClosures(restaurant.id),
     getBaseUrl(),
   ]);
 
@@ -30,7 +31,7 @@ export default async function HomePage() {
       <Hero restaurant={restaurant} preset={preset} />
       <About restaurant={restaurant} preset={preset} />
       <MenuPreview categories={categories} preset={preset} />
-      <OpeningHoursBlock hours={hours} preset={preset} />
+      <OpeningHoursBlock hours={hours} closures={closures} preset={preset} />
       <LocationMap restaurant={restaurant} preset={preset} />
       <ContactSection restaurant={restaurant} preset={preset} />
     </>

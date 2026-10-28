@@ -1,8 +1,9 @@
-import type { OpeningHour } from "@/types/database";
+import type { Closure, OpeningHour } from "@/types/database";
 import { isOpenNow } from "@/lib/opening-hours";
+import { getActiveClosure } from "@/lib/closures";
 
-export function OpenNowBadge({ hours }: { hours: OpeningHour[] }) {
-  const open = isOpenNow(hours);
+export function OpenNowBadge({ hours, closures = [] }: { hours: OpeningHour[]; closures?: Closure[] }) {
+  const open = getActiveClosure(closures) ? false : isOpenNow(hours);
 
   return (
     <span

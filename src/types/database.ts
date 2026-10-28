@@ -122,3 +122,34 @@ export interface Reservation {
 export interface MenuItemWithCategory extends MenuItem {
   category: Pick<Category, "id" | "name" | "display_order">;
 }
+
+export interface DailyMenu {
+  id: string;
+  restaurant_id: string;
+  title: string;
+  starter: string | null;
+  main: string | null;
+  dessert: string | null;
+  price: number;
+  valid_date: string; // "YYYY-MM-DD"
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Closure {
+  id: string;
+  restaurant_id: string;
+  start_date: string; // "YYYY-MM-DD"
+  end_date: string;
+  message: string | null;
+  created_at: string;
+}
+
+export interface Profile {
+  id: string;
+  role: AppRole;
+  restaurant_id: string | null;
+  full_name: string | null;
+  created_at: string;
+}

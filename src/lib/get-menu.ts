@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import type { Category, MenuItem, OpeningHour } from "@/types/database";
+import { todayInParis } from "@/lib/closures";
+import type { Category, Closure, DailyMenu, MenuItem, OpeningHour } from "@/types/database";
 
 export const getMenu = cache(async (restaurantId: string) => {
   const supabase = await createClient();
@@ -32,4 +33,30 @@ export const getOpeningHours = cache(async (restaurantId: string) => {
     .eq("restaurant_id", restaurantId);
 
   return (data ?? []) as OpeningHour[];
+});
+
+export const getClosures = cache(async (restaurantId: string) => {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("closures")
+    .select("*")
+    .eq("restaurant_id", restaurantId)
+    .gte("end_date", todayInParis())
+    .order("start_date", { ascending: true });
+
+  return (data ?? []) as Closure[];
+});
+
+/** Le menu du jour actif aujourd'hui (s'il y en a un). */
+export const getActiveDailyMenu = cache(async (restaurantId: string): Promise<DailyMenu | null> => {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("daily_menus")
+    .select("*")
+    .eq("restaurant_id", restaurantId)
+    .eq("valid_date", todayInParis())
+    .eq("is_active", true)
+    .maybeSingle();
+
+  return data as DailyMenu | null;
 });

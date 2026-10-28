@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { requireCurrentRestaurant, getBaseUrl } from "@/lib/get-current-restaurant";
-import { getMenu } from "@/lib/get-menu";
+import { getMenu, getActiveDailyMenu } from "@/lib/get-menu";
 import { buildMenuJsonLd } from "@/lib/seo";
 import { CategoryTabs } from "@/components/carte/CategoryTabs";
 import { MenuItemCard } from "@/components/carte/MenuItemCard";
 import { DailySpecialBanner } from "@/components/carte/DailySpecialBanner";
+import { DailyMenuBanner } from "@/components/carte/DailyMenuBanner";
 
 export async function generateMetadata(): Promise<Metadata> {
   const restaurant = await requireCurrentRestaurant();
@@ -13,8 +14,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function CartePage() {
   const restaurant = await requireCurrentRestaurant();
-  const [{ categories, items }, baseUrl] = await Promise.all([
+  const [{ categories, items }, dailyMenu, baseUrl] = await Promise.all([
     getMenu(restaurant.id),
+    getActiveDailyMenu(restaurant.id),
     getBaseUrl(),
   ]);
 
@@ -28,6 +30,7 @@ export default async function CartePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <CategoryTabs categories={sortedCategories} />
+      <DailyMenuBanner dailyMenu={dailyMenu} />
       <DailySpecialBanner items={items} />
       <div className="mx-auto max-w-2xl px-4 sm:px-6">
         {sortedCategories.map((category) => (
