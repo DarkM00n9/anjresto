@@ -58,7 +58,37 @@ npm run create-owner -- <email> <slug-du-resto>
 
 Relie (ou crée) un compte Supabase Auth à ce restaurant en tant que `owner`, pour
 pouvoir se connecter sur `/admin/login`. En attendant l'espace `/superadmin`
-(Phase 3), c'est la seule façon de provisionner un accès restaurateur.
+(Phase 3 ci-dessous l'utilise encore, Phase 4), c'est la seule façon de
+provisionner un accès restaurateur.
+
+## Phase 3 — ce qui est fait
+
+- Réservation en ligne sans commission (`/reservation`, lien "Réserver une table" du
+  Hero) : créneaux calculés automatiquement depuis les horaires, les fermetures
+  exceptionnelles et la capacité (`src/lib/reservations/availability.ts`), revalidés
+  côté serveur à la soumission.
+- Réglages par resto (`/admin/reservations/parametres`) : intervalle des créneaux
+  (15/30 min), capacité max par créneau, taille max d'un groupe en ligne (au-delà :
+  "appelez-nous"), délai minimum avant réservation, réservable jusqu'à X jours,
+  confirmation automatique ou validation manuelle.
+- Anti-spam : honeypot + rate limiting par IP (table dédiée, jamais exposée en RLS,
+  accès uniquement via la clé `service_role` côté serveur).
+- Emails (Resend) aux couleurs du resto : demande reçue / confirmée / refusée au
+  client (avec lien d'annulation sécurisé par token), nouvelle réservation au resto
+  avec boutons Accepter/Refuser (`/resa/{token}`, protégés par un token propre à la
+  réservation, utilisables sans être connecté).
+- **Admin** (`/admin/reservations`) : vue par jour avec navigation, compteur de
+  couverts par service, "Marquer complet" pour fermer un service en un tap, accepter
+  / refuser / annuler / marquer venu / absent, ajout manuel (réservation par
+  téléphone).
+- 2 routes cron Vercel (`vercel.json`, protégées par `CRON_SECRET`) : rappel la
+  veille (`/api/cron/reminders`) et purge RGPD des réservations de plus de 12 mois
+  (`/api/cron/purge-reservations`). Ne se déclenchent qu'une fois déployé sur Vercel
+  — en local, s'appellent à la main avec l'en-tête `Authorization: Bearer $CRON_SECRET`.
+- Nouvelles tables : `reservation_settings`, `blocked_services`,
+  `reservation_rate_limits` (`supabase/migrations/0007` à `0009`) ; `reservations`
+  étendue avec statuts `refused`/`seated`, tokens, source, consentement RGPD
+  (`0006`).
 
 ## Installation
 
@@ -71,7 +101,7 @@ cp .env.example .env.local
 2. Dans **Project Settings → API**, récupère l'URL du projet, la clé `anon` et la clé
    `service_role`, et renseigne-les dans `.env.local`.
 3. Dans l'éditeur SQL Supabase, exécute **dans l'ordre** tous les fichiers de
-   `supabase/migrations/` (`0001` à `0005`).
+   `supabase/migrations/` (`0001` à `0009`).
 4. Génère le restaurant de démo :
 
 ```bash
@@ -104,10 +134,16 @@ npm run dev
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clé publique Supabase (RLS appliquée) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Clé admin, utilisée uniquement par `scripts/seed.ts` |
 | `NEXT_PUBLIC_ROOT_DOMAIN` | Domaine racine de prod pour les sous-domaines `{slug}.ROOT_DOMAIN` |
-| `RESEND_API_KEY` | Réservé aux phases suivantes (emails transactionnels) |
+| `RESEND_API_KEY` | Clé API Resend, pour l'envoi réel des emails de réservation |
+| `RESEND_FROM_EMAIL` | Optionnel : adresse d'envoi une fois un domaine vérifié sur Resend (sinon `onboarding@resend.dev`, adresse de test) |
+| `CRON_SECRET` | Protège les routes `/api/cron/*` (Vercel envoie `Authorization: Bearer $CRON_SECRET`) |
+
+Sans `RESEND_API_KEY`, les emails ne sont pas envoyés mais tout le reste fonctionne
+normalement (un avertissement est juste loggé côté serveur) — pratique pour tester
+le flux de réservation sans compte Resend.
 
 ## Ajouter un nouveau restaurant
 
-Pour l'instant (avant l'espace `/superadmin`, phase 3), insérer une ligne dans la
+Pour l'instant (avant l'espace `/superadmin`, Phase 4), insérer une ligne dans la
 table `restaurants` (slug unique) + ses `categories` / `menu_items` / `opening_hours`
 suffit à faire apparaître son site — sans toucher au code.

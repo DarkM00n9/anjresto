@@ -42,7 +42,7 @@ export function Hero({ restaurant, preset }: HeroProps) {
           <p className="max-w-xl text-lg text-white/90 sm:text-xl">{restaurant.tagline}</p>
         )}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <ButtonLink href="#contact">Réserver une table</ButtonLink>
+          <ButtonLink href="/reservation">Réserver une table</ButtonLink>
           <ButtonLink href="/carte" variant="outline-white">
             Voir la carte
           </ButtonLink>

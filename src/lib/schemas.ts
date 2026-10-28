@@ -103,3 +103,45 @@ export const restaurantInfoSchema = z.object({
   gallery_urls: z.array(z.string()).max(4),
 });
 export type RestaurantInfoInput = z.infer<typeof restaurantInfoSchema>;
+
+export const reservationFormSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date invalide"),
+  time: z.string().regex(/^\d{2}:\d{2}$/, "Heure invalide"),
+  party_size: z.coerce.number().int().min(1, "Au moins 1 personne").max(50),
+  customer_name: z.string().trim().min(1, "Nom requis").max(100),
+  customer_phone: z.string().trim().min(6, "Téléphone requis").max(30),
+  customer_email: z.string().trim().email("Email invalide").optional().or(z.literal("")),
+  notes: z.string().trim().max(500).optional().or(z.literal("")),
+  consent: z.boolean().refine((v) => v === true, { message: "Merci d'accepter l'utilisation de tes données" }),
+});
+export type ReservationFormInput = z.infer<typeof reservationFormSchema>;
+export type ReservationFormValues = z.input<typeof reservationFormSchema>;
+
+export const reservationSettingsSchema = z.object({
+  slot_interval_minutes: z.coerce.number().refine((v) => v === 15 || v === 30, "15 ou 30 minutes"),
+  max_covers_per_slot: z.coerce.number().int().min(1).max(500),
+  max_party_size_online: z.coerce.number().int().min(1).max(50),
+  min_advance_hours: z.coerce.number().int().min(0).max(168),
+  max_advance_days: z.coerce.number().int().min(1).max(365),
+  auto_confirm: z.boolean(),
+});
+export type ReservationSettingsInput = z.infer<typeof reservationSettingsSchema>;
+export type ReservationSettingsFormValues = z.input<typeof reservationSettingsSchema>;
+
+export const manualReservationSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date invalide"),
+  time: z.string().regex(/^\d{2}:\d{2}$/, "Heure invalide"),
+  party_size: z.coerce.number().int().min(1, "Au moins 1 personne").max(200),
+  customer_name: z.string().trim().min(1, "Nom requis").max(100),
+  customer_phone: z.string().trim().min(6, "Téléphone requis").max(30),
+  notes: z.string().trim().max(500).optional().or(z.literal("")),
+});
+export type ManualReservationInput = z.infer<typeof manualReservationSchema>;
+export type ManualReservationFormValues = z.input<typeof manualReservationSchema>;
+
+export const closureSettingsSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date invalide"),
+  opens_at: z.string().regex(/^\d{2}:\d{2}$/),
+  closes_at: z.string().regex(/^\d{2}:\d{2}$/),
+});
+export type BlockedServiceInput = z.infer<typeof closureSettingsSchema>;

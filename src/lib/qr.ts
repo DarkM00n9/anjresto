@@ -1,11 +1,11 @@
 import QRCode from "qrcode";
 import { PDFDocument, StandardFonts, rgb, type PDFImage } from "pdf-lib";
 import type { Restaurant } from "@/types/database";
+import { buildPublicOrigin } from "@/lib/url";
 
 /** URL publique (prod) de la carte, utilisée pour le QR — jamais l'URL locale /r/{slug}. */
 export function buildPublicCarteUrl(restaurant: Restaurant, rootDomain: string): string {
-  const host = restaurant.custom_domain || `${restaurant.slug}.${rootDomain}`;
-  return `https://${host}/carte`;
+  return `${buildPublicOrigin(restaurant, rootDomain)}/carte`;
 }
 
 export async function generateQrPngBuffer(url: string): Promise<Buffer> {

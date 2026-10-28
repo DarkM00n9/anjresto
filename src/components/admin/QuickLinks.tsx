@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 const LINKS = [
+  { href: "/admin/reservations", label: "Réservations", icon: "📅" },
   { href: "/admin/carte", label: "Modifier ma carte", icon: "📋" },
   { href: "/admin/menu-du-jour", label: "Menu du jour", icon: "☀️" },
   { href: "/admin/horaires", label: "Horaires", icon: "🕒" },
@@ -8,7 +9,7 @@ const LINKS = [
 
 export function QuickLinks() {
   return (
-    <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
       {LINKS.map((link) => (
         <Link
           key={link.href}

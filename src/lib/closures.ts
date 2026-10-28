@@ -1,9 +1,7 @@
 import type { Closure } from "@/types/database";
+import { todayInParis } from "@/lib/datetime";
 
-/** Date du jour (Europe/Paris) au format YYYY-MM-DD, comparable aux colonnes `date`. */
-export function todayInParis(): string {
-  return new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Paris" });
-}
+export { todayInParis };
 
 /** La fermeture exceptionnelle en cours aujourd'hui, s'il y en a une. */
 export function getActiveClosure(closures: Closure[]): Closure | null {

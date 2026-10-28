@@ -27,8 +27,12 @@ export type LayoutStyle =
 export type ReservationStatus =
   | "pending"
   | "confirmed"
+  | "refused"
   | "cancelled"
+  | "seated"
   | "no_show";
+
+export type ReservationSource = "online" | "phone";
 
 export interface RestaurantTheme {
   primary_color: string;
@@ -116,7 +120,13 @@ export interface Reservation {
   reservation_time: string;
   status: ReservationStatus;
   notes: string | null;
+  cancellation_token: string;
+  action_token: string;
+  source: ReservationSource;
+  consent: boolean;
+  reminder_sent_at: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 export interface MenuItemWithCategory extends MenuItem {
@@ -151,5 +161,25 @@ export interface Profile {
   role: AppRole;
   restaurant_id: string | null;
   full_name: string | null;
+  created_at: string;
+}
+
+export interface ReservationSettings {
+  restaurant_id: string;
+  slot_interval_minutes: 15 | 30;
+  max_covers_per_slot: number;
+  max_party_size_online: number;
+  min_advance_hours: number;
+  max_advance_days: number;
+  auto_confirm: boolean;
+  updated_at: string;
+}
+
+export interface BlockedService {
+  id: string;
+  restaurant_id: string;
+  date: string; // "YYYY-MM-DD"
+  opens_at: string; // "HH:MM:SS"
+  closes_at: string;
   created_at: string;
 }

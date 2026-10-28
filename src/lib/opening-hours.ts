@@ -1,6 +1,6 @@
 import type { OpeningHour } from "@/types/database";
+import { nowInParis, toMinutes } from "@/lib/datetime";
 
-const TIMEZONE = "Europe/Paris";
 const DAY_LABELS = [
   "Dimanche",
   "Lundi",
@@ -10,15 +10,6 @@ const DAY_LABELS = [
   "Vendredi",
   "Samedi",
 ];
-
-function nowInParis(): Date {
-  return new Date(new Date().toLocaleString("en-US", { timeZone: TIMEZONE }));
-}
-
-function toMinutes(time: string): number {
-  const [h, m] = time.split(":").map(Number);
-  return h * 60 + m;
-}
 
 /** Détermine si le restaurant est ouvert à l'instant présent (fuseau Europe/Paris). */
 export function isOpenNow(hours: OpeningHour[]): boolean {
