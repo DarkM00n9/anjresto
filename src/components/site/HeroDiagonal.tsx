@@ -1,99 +1,84 @@
 import Image from "next/image";
+import Link from "next/link";
+import type { CSSProperties } from "react";
 import type { Restaurant } from "@/types/database";
-import { ButtonLink } from "@/components/ui/Button";
-import { ArrowDown, MapPin } from "lucide-react";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { GoogleReviews } from "./GoogleReviews";
 import { getT, getLocalize } from "@/lib/lang";
 
-/** Hero « Moderne diagonale » : texte à gauche, grande photo ronde à cheval sur une diagonale colorée. */
+/** Composition éditoriale du thème moderne, avec une découpe diagonale discrète. */
 export async function HeroDiagonal({ restaurant }: { restaurant: Restaurant }) {
   const t = await getT();
   const L = await getLocalize();
-  const delay = (ms: number) => ({ "--enter-delay": `${ms}ms` }) as React.CSSProperties;
+  const introduction = L(restaurant.description, restaurant.description_en)?.split(/\n\s*\n/)[0];
+  const delay = (ms: number) => ({ "--enter-delay": `${ms}ms` }) as CSSProperties;
 
   return (
-    <section className="relative isolate overflow-hidden bg-stone-50">
-      {/* Diagonale colorée : à droite sur grand écran, en bas sur mobile. */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[var(--color-secondary)] [clip-path:polygon(0_72%,100%_58%,100%_100%,0_100%)] md:[clip-path:polygon(62%_0,100%_0,100%_100%,42%_100%)]"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[var(--color-primary)]/90 [clip-path:polygon(0_72%,100%_58%,100%_61%,0_75%)] md:[clip-path:polygon(60%_0,62%_0,44%_100%,42%_100%)]"
-      />
-
-      <div className="mx-auto grid min-h-[min(820px,calc(100svh-64px))] max-w-7xl items-center gap-10 px-5 py-14 sm:px-8 md:grid-cols-[1.05fr_0.95fr] md:gap-6 md:py-20 lg:px-10">
-        <div className="relative z-10">
-          {restaurant.city && (
-            <p style={delay(150)} className="hero-enter inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-secondary)] shadow-sm ring-1 ring-black/5">
-              <MapPin className="h-3.5 w-3.5 text-[var(--color-primary)]" />
-              {restaurant.city}
-            </p>
-          )}
-          <h1
-            style={delay(300)}
-            className="hero-enter mt-5 font-[family-name:var(--font-title)] text-5xl font-normal leading-[0.98] tracking-[-0.04em] text-[var(--color-secondary)] sm:text-6xl lg:text-7xl"
-          >
+    <section className="maison-home maison-hero">
+      <div className="maison-shell grid items-center gap-10 py-10 sm:py-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-14 lg:py-16">
+        <div className="min-w-0 lg:py-6">
+          <p className="maison-eyebrow hero-enter" style={delay(80)}>
+            <span className="h-px w-7 bg-current" aria-hidden="true" />
+            {[restaurant.city, restaurant.cuisine_type].filter(Boolean).join(" · ") || t("La maison")}
+          </p>
+          <h1 className="maison-title hero-enter mt-7 text-[clamp(3.5rem,8vw,7.5rem)] leading-[0.98]" style={delay(160)}>
             {restaurant.name}
           </h1>
-          {restaurant.tagline && (
-            <p style={delay(500)} className="hero-enter mt-5 max-w-sm text-base leading-7 text-stone-700 md:max-w-[17rem] lg:max-w-sm sm:text-lg sm:leading-8">
-              {L(restaurant.tagline, restaurant.tagline_en)}
-            </p>
-          )}
-          <div style={delay(700)} className="hero-enter mt-8 flex flex-wrap items-center gap-3">
-            <ButtonLink href="/reservation" size="lg" className="min-w-48">
-              {t("Réserver une table")}
-            </ButtonLink>
-            <ButtonLink href="/carte" variant="outline" size="lg">
-              {t("Voir la carte")}
-            </ButtonLink>
+          <p className="maison-title hero-enter mt-5 max-w-lg text-3xl italic leading-[1.2] text-[var(--color-primary)] sm:text-4xl" style={delay(240)}>
+            {t("Les bons moments se partagent.")}
+          </p>
+          <p className="hero-enter mt-7 max-w-md text-[15px] leading-7 text-stone-600" style={delay(320)}>
+            {introduction || L(restaurant.tagline, restaurant.tagline_en) || t("Une table, une cuisine, un moment à partager.")}
+          </p>
+          <div className="hero-enter mt-8 flex flex-wrap items-center gap-x-7 gap-y-5" style={delay(400)}>
+            <Link href="/reservation" className="maison-button">
+              {t("Réserver une table")} <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+            <Link href="/carte" className="maison-text-link">
+              {t("Voir la carte")} <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
           </div>
           {restaurant.google_rating ? (
-            <div style={delay(900)} className="hero-enter mt-8 inline-flex rounded-full bg-[var(--color-secondary)] p-0.5">
+            <div className="mt-7 inline-flex rounded-full bg-[var(--color-secondary)] p-0.5">
               <GoogleReviews restaurant={restaurant} />
             </div>
           ) : null}
+          <a href="#histoire" className="mt-12 inline-flex min-h-11 items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-500 transition-colors hover:text-[var(--color-primary)]">
+            <ArrowDown className="h-4 w-4" aria-hidden="true" /> {t("Découvrir la maison")}
+          </a>
         </div>
 
-        <div style={delay(400)} className="hero-enter relative mx-auto w-full max-w-[min(88vw,520px)]">
-          <div className="relative aspect-square">
-            <div aria-hidden="true" className="absolute -inset-3 rounded-full border-2 border-dashed border-white/50 md:border-white/40" />
-            <div className="relative h-full w-full overflow-hidden rounded-full border-[10px] border-white shadow-2xl shadow-black/30">
-              {restaurant.cover_image_url ? (
-                <Image
-                  src={restaurant.cover_image_url}
-                  alt={restaurant.name}
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 88vw, 520px"
-                  className="object-cover"
-                />
-              ) : (
-                <div className="h-full w-full bg-[var(--color-primary)]" />
-              )}
-            </div>
-            {restaurant.logo_url && (
-              <Image
-                src={restaurant.logo_url}
-                alt={`Logo ${restaurant.name}`}
-                width={88}
-                height={88}
-                className="hero-bob absolute -bottom-2 left-2 h-20 w-20 rounded-full border-4 border-white bg-white object-cover shadow-xl sm:h-[88px] sm:w-[88px]"
-              />
+        <figure className="hero-enter relative m-0" style={delay(220)}>
+          <div className="maison-hero-photo relative aspect-[4/5] overflow-hidden bg-[var(--color-secondary)] sm:aspect-[5/4] lg:aspect-[4/5]">
+            {restaurant.cover_image_url && (
+              <Image src={restaurant.cover_image_url} alt={`${restaurant.name} — ${t("La maison")}`} fill preload sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
             )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div className="absolute inset-x-6 bottom-7 flex items-end justify-between gap-5 text-white sm:inset-x-8">
+              <span className="font-[family-name:var(--font-title)] text-3xl italic sm:text-4xl">{t("À table.")}</span>
+              {restaurant.city && <span className="pb-1 text-[10px] font-medium uppercase tracking-[0.2em]">{restaurant.city}</span>}
+            </div>
           </div>
-        </div>
+          <figcaption className="mt-4 flex items-center justify-between gap-4 text-[10px] uppercase tracking-[0.18em] text-stone-500">
+            <span>{t("Le plaisir d’être ensemble")}</span>
+            <span aria-hidden="true">01 / 03</span>
+          </figcaption>
+        </figure>
       </div>
-
-      <a
-        href="#histoire"
-        className="hero-enter absolute bottom-5 left-8 hidden items-center lg:left-10 gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600 hover:text-[var(--color-secondary)] md:inline-flex"
-        style={delay(1200)}
-      >
-        {t("Découvrir la maison")} <ArrowDown className="hero-bob h-4 w-4" />
-      </a>
+      <nav aria-label={t("Explorer le restaurant")} className="border-y border-stone-300/70">
+        <div className="maison-shell grid grid-cols-3 divide-x divide-stone-300/70">
+          {[
+            { href: "/carte", label: t("La carte") },
+            { href: "#horaires", label: t("Horaires") },
+            { href: "#adresse", label: t("Nous trouver") },
+          ].map((item, index) => (
+            <Link key={item.href} href={item.href} className="group flex min-h-16 items-center justify-between gap-2 px-2 py-4 text-xs font-medium transition-colors hover:text-[var(--color-primary)] sm:px-6 sm:py-5 sm:text-sm">
+              <span><span className="mr-3 hidden text-[10px] text-stone-400 sm:inline">0{index + 1}</span>{item.label}</span>
+              <ArrowUpRight className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
+            </Link>
+          ))}
+        </div>
+      </nav>
     </section>
   );
 }

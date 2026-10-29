@@ -9,7 +9,7 @@ import { MenuPreview } from "@/components/site/MenuPreview";
 import { OpeningHoursBlock } from "@/components/site/OpeningHoursBlock";
 import { LocationMap } from "@/components/site/LocationMap";
 import { ContactSection } from "@/components/site/ContactSection";
-import { ModernAbout, ModernContact, ModernHours, ModernLocation, ModernMenu } from "@/components/site/modern/ModernSections";
+import { ModernAbout, ModernContact, ModernVisit, ModernMenu } from "@/components/site/modern/ModernSections";
 
 export default async function HomePage() {
   const restaurant = await requireCurrentRestaurant();
@@ -36,9 +36,8 @@ export default async function HomePage() {
       {modern ? (
         <>
           <Reveal><ModernAbout restaurant={restaurant} /></Reveal>
-          <ModernMenu categories={categories} items={items} />
-          <Reveal><ModernHours hours={hours} closures={closures} restaurant={restaurant} /></Reveal>
-          <Reveal><ModernLocation restaurant={restaurant} /></Reveal>
+          <ModernMenu categories={categories} items={items} restaurant={restaurant} />
+          <Reveal><ModernVisit hours={hours} closures={closures} restaurant={restaurant} /></Reveal>
           <Reveal><ModernContact restaurant={restaurant} /></Reveal>
         </>
       ) : (

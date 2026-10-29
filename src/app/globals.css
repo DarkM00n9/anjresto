@@ -34,6 +34,90 @@ body {
   outline-offset: 2px;
 }
 
+/* Public editorial theme: warm paper, photographic compositions and quiet rules. */
+.maison-home {
+  background: #f6f3eb;
+  color: var(--color-secondary);
+}
+.maison-shell {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+.maison-title {
+  font-family: var(--font-title), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.maison-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.7;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.maison-hero-photo {
+  clip-path: polygon(8% 0, 100% 0, 100% 100%, 0 100%, 0 8%);
+}
+.maison-menu {
+  background: var(--color-secondary);
+  color: #f6f3eb;
+}
+.maison-section {
+  scroll-margin-top: 100px;
+}
+.maison-button {
+  display: inline-flex;
+  min-height: 52px;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  padding: 15px 22px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  transition: filter 180ms ease, transform 180ms ease;
+}
+.maison-button:hover { filter: brightness(0.92); }
+.maison-button:active { transform: translateY(1px); }
+.maison-button svg { flex-shrink: 0; }
+.maison-text-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid currentColor;
+  padding-block: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 180ms ease;
+}
+.maison-text-link:hover { color: var(--color-primary); }
+.maison-home :focus-visible,
+.maison-menu :focus-visible,
+.maison-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 5px;
+}
+@media (min-width: 640px) {
+  .maison-shell { padding-inline: 40px; }
+}
+@media (min-width: 1024px) {
+  .maison-shell { padding-inline: 48px; }
+}
+
 /* ---------- Animations (scroll reveal, hero, page enter) ---------- */
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(28px); }

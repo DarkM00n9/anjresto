@@ -1,74 +1,54 @@
 import Image from "next/image";
-import { ArrowUpRight, Clock, Mail, MapPin, Navigation, Phone, Star, UtensilsCrossed } from "lucide-react";
+import Link from "next/link";
+import { ArrowUpRight, Mail, Navigation, Phone } from "lucide-react";
 import type { Category, Closure, MenuItem, OpeningHour, Restaurant } from "@/types/database";
-import { ButtonLink } from "@/components/ui/Button";
 import { OpenNowBadge } from "@/components/site/OpenNowBadge";
 import { groupHoursByDay } from "@/lib/opening-hours";
 import { getActiveClosure } from "@/lib/closures";
-import { getLocalize, getT } from "@/lib/lang";
+import { getLang, getLocalize, getT } from "@/lib/lang";
 
-/** Petite étiquette arrondie au-dessus des titres. */
-function Pill({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
-  return (
-    <span
-      className={`inline-flex items-center rounded-full px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] ${
-        dark ? "bg-white/10 text-white ring-1 ring-white/20" : "bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
-      }`}
-    >
-      {children}
-    </span>
-  );
+function galleryImages(restaurant: Restaurant) {
+  const key = (url: string) => url.split(/[?#]/, 1)[0];
+  const seen = new Set(restaurant.cover_image_url ? [key(restaurant.cover_image_url)] : []);
+  return restaurant.gallery_urls.filter((url) => {
+    const imageKey = key(url);
+    if (seen.has(imageKey)) return false;
+    seen.add(imageKey);
+    return true;
+  });
 }
 
-const TITLE = "font-[family-name:var(--font-title)] font-normal leading-[1.02] tracking-[-0.035em]";
-
-/* ------------------------------------------------------------------ Histoire */
 export async function ModernAbout({ restaurant }: { restaurant: Restaurant }) {
   const t = await getT();
   const L = await getLocalize();
   if (!restaurant.description && restaurant.gallery_urls.length === 0) return null;
-  const images = restaurant.gallery_urls.slice(0, 2);
+  const images = galleryImages(restaurant);
   const main = images[0] ?? restaurant.cover_image_url;
-  const second = images[1] ?? null;
+  const second = images[1];
 
   return (
-    <section id="histoire" className="bg-stone-50 py-20 md:py-28">
-      <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 sm:px-8 md:grid-cols-2 lg:px-10">
+    <section id="histoire" className="maison-home maison-section py-20 sm:py-28 lg:py-32">
+      <div className={`maison-shell grid items-center gap-12 lg:gap-24 ${main ? "md:grid-cols-2" : "max-w-3xl"}`}>
         {main && (
-          <div className="relative mx-auto w-full max-w-[520px]">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[2.5rem] shadow-2xl shadow-black/15">
-              <Image src={main} alt={restaurant.name} fill sizes="(max-width: 768px) 90vw, 520px" className="object-cover" />
-            </div>
+          <div className="relative pb-10 pr-10 sm:pb-14 sm:pr-14">
+            <figure className="relative m-0 aspect-[4/5] overflow-hidden bg-stone-200">
+              <Image src={main} alt={`${restaurant.name} — ${t("La maison en images")}`} fill sizes="(max-width: 768px) 85vw, 42vw" className="object-cover" />
+            </figure>
             {second && (
-              <div className="absolute -bottom-8 -right-4 h-40 w-40 overflow-hidden rounded-full border-[8px] border-stone-50 shadow-xl sm:-right-8 sm:h-52 sm:w-52">
-                <Image src={second} alt="" fill sizes="208px" className="object-cover" />
+              <div className="absolute bottom-0 right-0 aspect-[4/5] w-[42%] overflow-hidden border-[6px] border-[#f6f3eb] bg-stone-200 sm:border-[10px]">
+                <Image src={second} alt={`${restaurant.name} — ${t("Un autre regard")}`} fill sizes="(max-width: 768px) 36vw, 20vw" className="object-cover" />
               </div>
             )}
-            <div aria-hidden="true" className="absolute -left-6 -top-6 -z-10 h-32 w-32 rounded-full bg-[var(--color-primary)]/20" />
+            <span aria-hidden="true" className="absolute bottom-1 left-0 text-[10px] uppercase tracking-[0.2em] text-stone-500">02 / 03 — {t("La maison")}</span>
           </div>
         )}
-        <div>
-          <Pill>{t("Notre histoire")}</Pill>
-          <h2 className={`${TITLE} mt-5 text-4xl text-[var(--color-secondary)] sm:text-5xl lg:text-6xl`}>{t("L’esprit de la maison")}</h2>
-          {restaurant.description && (
-            <p className="mt-6 max-w-xl whitespace-pre-line text-base leading-8 text-stone-700 sm:text-lg">{L(restaurant.description, restaurant.description_en)}</p>
-          )}
-          <div className="mt-8 flex flex-wrap gap-3">
-            {restaurant.cuisine_type && (
-              <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[var(--color-secondary)] shadow-sm ring-1 ring-black/5">{restaurant.cuisine_type}</span>
-            )}
-            {restaurant.city && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[var(--color-secondary)] shadow-sm ring-1 ring-black/5">
-                <MapPin className="h-4 w-4 text-[var(--color-primary)]" />
-                {restaurant.city}
-              </span>
-            )}
-            {restaurant.google_rating ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[var(--color-secondary)] shadow-sm ring-1 ring-black/5">
-                <Star className="h-4 w-4 text-amber-500" fill="currentColor" />
-                {Number(restaurant.google_rating).toFixed(1)}
-              </span>
-            ) : null}
+        <div className="min-w-0">
+          <p className="maison-eyebrow"><span className="text-stone-400">01</span>{t("L’esprit de la maison")}</p>
+          <h2 className="maison-title mt-6 text-4xl leading-[1.12] sm:text-5xl lg:text-6xl">{t("Une maison.")}<br /><span className="italic text-[var(--color-primary)]">{t("Des moments.")}</span></h2>
+          {restaurant.description && <p className="mt-7 whitespace-pre-line text-[15px] leading-8 text-stone-600">{L(restaurant.description, restaurant.description_en)}</p>}
+          <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-3 border-t border-stone-300/70 pt-6 text-[11px] font-medium uppercase tracking-[0.15em]">
+            {restaurant.cuisine_type && <span>{restaurant.cuisine_type}</span>}
+            {restaurant.city && <span className="text-stone-500">{restaurant.city}</span>}
           </div>
         </div>
       </div>
@@ -76,203 +56,128 @@ export async function ModernAbout({ restaurant }: { restaurant: Restaurant }) {
   );
 }
 
-/* ---------------------------------------------------------------------- Carte */
-export async function ModernMenu({ categories, items }: { categories: Category[]; items: MenuItem[] }) {
+export async function ModernMenu({ categories, items, restaurant }: { categories: Category[]; items: MenuItem[]; restaurant: Restaurant }) {
   const t = await getT();
   const L = await getLocalize();
+  const lang = await getLang();
   if (categories.length === 0 && items.length === 0) return null;
-  const names = new Map(categories.map((c) => [c.id, L(c.name, c.name_en)]));
-  const picks = [...items]
-    .filter((i) => i.is_available)
-    .sort(
-      (a, b) =>
-        Number(b.is_daily_special) - Number(a.is_daily_special) ||
-        Number(Boolean(b.photo_url)) - Number(Boolean(a.photo_url)) ||
-        a.display_order - b.display_order,
-    )
-    .slice(0, 4);
+  const names = new Map(categories.map((category) => [category.id, L(category.name, category.name_en)]));
+  const picks = [...items].filter((item) => item.is_available).sort((a, b) =>
+    Number(b.is_daily_special) - Number(a.is_daily_special) || Number(Boolean(b.photo_url)) - Number(Boolean(a.photo_url)) || a.display_order - b.display_order,
+  ).slice(0, 3);
+  const scene = galleryImages(restaurant).at(-1);
+  const price = new Intl.NumberFormat(lang === "en" ? "en-GB" : "fr-FR", { style: "currency", currency: "EUR" });
 
   return (
-    <section className="relative bg-[var(--color-secondary)] py-24 text-white [clip-path:polygon(0_6%,100%_0,100%_94%,0_100%)] md:py-36">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
-        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+    <section className="maison-menu py-20 sm:py-28">
+      <div className="maison-shell">
+        <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-end md:gap-16">
           <div>
-            <Pill dark>{t("La carte")}</Pill>
-            <h2 className={`${TITLE} mt-5 max-w-xl text-4xl sm:text-5xl lg:text-6xl`}>{t("Un avant-goût de la maison")}</h2>
+            <p className="maison-eyebrow text-white/65"><span className="text-white/40">02</span>{t("À la carte")}</p>
+            <h2 className="maison-title mt-6 text-4xl leading-[1.12] sm:text-5xl lg:text-6xl">{t("L’envie commence")}<br /><span className="italic text-[#e8bba0]">{t("dans l’assiette.")}</span></h2>
           </div>
-          <ButtonLink href="/carte" size="lg" icon={<ArrowUpRight className="h-4 w-4" />}>
-            {t("Découvrir toute la carte")}
-          </ButtonLink>
+          <p className="max-w-md text-sm leading-7 text-white/70">{t("Quelques suggestions pour vous mettre en appétit. Retrouvez tous nos plats et leurs informations sur la carte complète.")}</p>
         </div>
 
-        {picks.length > 0 ? (
-          <div className="mt-20 grid gap-x-6 gap-y-20 sm:grid-cols-2 lg:grid-cols-4">
-            {picks.map((item) => (
-              <article key={item.id} className="relative rounded-[2rem] bg-white px-5 pb-6 pt-20 text-center text-stone-900 shadow-xl shadow-black/20">
-                <div className="absolute -top-14 left-1/2 h-32 w-32 -translate-x-1/2 overflow-hidden rounded-full border-[6px] border-[var(--color-secondary)] bg-stone-200 shadow-lg">
-                  {item.photo_url ? (
-                    <Image src={item.photo_url} alt={L(item.name, item.name_en) ?? ""} fill sizes="128px" className="object-cover" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--color-primary)]/25 to-[var(--color-primary)]/10 text-[var(--color-primary)]"><UtensilsCrossed className="h-10 w-10" /></div>
-                  )}
-                </div>
-                {names.get(item.category_id) && (
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">{names.get(item.category_id)}</p>
-                )}
-                <h3 className={`${TITLE} mt-1 text-xl text-[var(--color-secondary)]`}>{L(item.name, item.name_en)}</h3>
-                {item.description && <p className="mt-2 line-clamp-3 text-sm leading-6 text-stone-600">{L(item.description, item.description_en)}</p>}
-                <span className="mt-4 inline-block rounded-full bg-[var(--color-primary)] px-4 py-1.5 text-sm font-bold tabular-nums text-white">
-                  {item.price.toFixed(2)} €
-                </span>
-              </article>
-            ))}
+        <div className={`mt-12 grid items-start gap-10 lg:gap-16 ${scene ? "md:grid-cols-[0.85fr_1.15fr]" : ""}`}>
+          {scene && (
+            <figure className="m-0">
+              <div className="relative aspect-[16/10] overflow-hidden bg-white/10 md:aspect-[4/5]">
+                <Image src={scene} alt={`${restaurant.name} — ${t("La maison en images")}`} fill sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" />
+              </div>
+              <figcaption className="mt-4 flex justify-between gap-4 text-[10px] uppercase tracking-[0.16em] text-white/55"><span>{t("La maison en images")}</span><span aria-hidden="true">03 / 03</span></figcaption>
+            </figure>
+          )}
+          <div>
+            {picks.length > 0 ? (
+              <div className="border-t border-white/20">
+                {picks.map((item, index) => (
+                  <article key={item.id} className="border-b border-white/20 py-7 sm:py-8">
+                    <div className="flex items-start gap-4">
+                      {item.photo_url && <div className="relative h-20 w-20 shrink-0 overflow-hidden bg-white/10"><Image src={item.photo_url} alt={L(item.name, item.name_en) ?? ""} fill sizes="80px" className="object-cover" /></div>}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-medium uppercase tracking-[0.17em] text-white/55"><span className="mr-3 text-[#e8bba0]">0{index + 1}</span>{names.get(item.category_id) ?? ""}</p>
+                        <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-5 gap-y-2">
+                          <h3 className="maison-title min-w-0 text-2xl leading-tight sm:text-3xl">{L(item.name, item.name_en)}</h3>
+                          <span className="shrink-0 text-sm tabular-nums text-[#e8bba0]">{price.format(item.price)}</span>
+                        </div>
+                        {item.description && <p className="mt-3 text-sm leading-6 text-white/65">{L(item.description, item.description_en)}</p>}
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <ul className="divide-y divide-white/20 border-y border-white/20">
+                {categories.map((category) => <li key={category.id} className="maison-title py-5 text-2xl">{L(category.name, category.name_en)}</li>)}
+              </ul>
+            )}
+            <Link href="/carte" className="maison-button mt-8">{t("Découvrir toute la carte")}<ArrowUpRight className="h-4 w-4" aria-hidden="true" /></Link>
           </div>
-        ) : (
-          <ul className="mt-12 flex flex-wrap gap-3">
-            {categories.map((c) => (
-              <li key={c.id} className="rounded-full bg-white/10 px-5 py-2 text-sm font-semibold ring-1 ring-white/20">{L(c.name, c.name_en)}</li>
-            ))}
-          </ul>
-        )}
+        </div>
       </div>
     </section>
   );
 }
 
-/* -------------------------------------------------------------------- Horaires */
-export async function ModernHours({ hours, closures, restaurant }: { hours: OpeningHour[]; closures: Closure[]; restaurant: Restaurant }) {
+export async function ModernVisit({ hours, closures, restaurant }: { hours: OpeningHour[]; closures: Closure[]; restaurant: Restaurant }) {
   const t = await getT();
   const schedule = groupHoursByDay(hours);
   const activeClosure = getActiveClosure(closures);
-
-  return (
-    <section id="horaires" className="bg-stone-50 py-20 md:py-28">
-      <div className="mx-auto grid max-w-7xl items-stretch gap-8 px-5 sm:px-8 lg:grid-cols-[1.1fr_0.9fr] lg:px-10">
-        <div className="rounded-[2rem] bg-white p-6 shadow-xl shadow-black/5 ring-1 ring-black/5 sm:p-10">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <Pill>{t("À votre rythme")}</Pill>
-              <h2 className={`${TITLE} mt-4 text-4xl text-[var(--color-secondary)] sm:text-5xl`}>{t("Horaires")}</h2>
-            </div>
-            <OpenNowBadge hours={hours} closures={closures} />
-          </div>
-          {activeClosure && (
-            <p className="mt-5 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{activeClosure.message || t("Fermeture exceptionnelle en cours.")}</p>
-          )}
-          <ul className="mt-6 space-y-1.5">
-            {schedule.map((day) => (
-              <li
-                key={day.day}
-                className={`flex items-center justify-between gap-4 rounded-full px-5 py-3 text-sm ${
-                  day.isToday ? "bg-[var(--color-primary)] font-semibold text-white" : "text-stone-700 odd:bg-stone-50"
-                }`}
-              >
-                <span>{t(day.label)}</span>
-                <span className="text-right">
-                  {day.isClosed ? t("Fermé") : day.slots.map((s) => `${s.opensAt} – ${s.closesAt}`).join(" · ")}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="relative flex flex-col justify-between overflow-hidden rounded-[2rem] bg-[var(--color-primary)] p-8 text-white shadow-xl shadow-black/10 sm:p-10">
-          <div aria-hidden="true" className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10" />
-          <div aria-hidden="true" className="absolute -bottom-20 -left-10 h-60 w-60 rounded-full bg-black/10" />
-          <div className="relative">
-            <Clock className="h-9 w-9" />
-            <h3 className={`${TITLE} mt-5 text-3xl sm:text-4xl`}>{t("Réserver une table")}</h3>
-            <p className="mt-3 max-w-sm text-white/90">
-              {t("Nous serons ravis de vous accueillir. Pensez à réserver votre table pour le créneau qui vous convient.")}
-            </p>
-          </div>
-          <div className="relative mt-8">
-            <ButtonLink href="/reservation" variant="outline-white" size="lg" icon={<ArrowUpRight className="h-4 w-4" />}>
-              {t("Réserver une table")}
-            </ButtonLink>
-            {restaurant.phone && (
-              <a href={`tel:${restaurant.phone.replace(/\s+/g, "")}`} className="mt-5 flex items-center gap-2 text-sm font-semibold text-white/95">
-                <Phone className="h-4 w-4" /> {restaurant.phone}
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* --------------------------------------------------------------------- Adresse */
-export async function ModernLocation({ restaurant }: { restaurant: Restaurant }) {
-  const t = await getT();
   const address = [restaurant.address_line, restaurant.postal_code, restaurant.city].filter(Boolean).join(", ");
-  if (!address) return null;
   const query = encodeURIComponent(address);
 
   return (
-    <section id="adresse" className="bg-stone-50 pb-20 md:pb-28">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
-        <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl shadow-black/10 ring-1 ring-black/5">
-          <iframe
-            title={`Carte - ${restaurant.name}`}
-            src={`https://www.google.com/maps?q=${query}&output=embed`}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="h-[420px] w-full border-0 sm:h-[480px]"
-          />
-          <div className="absolute inset-x-4 bottom-4 rounded-3xl bg-white p-5 shadow-xl sm:inset-x-auto sm:bottom-6 sm:left-6 sm:max-w-sm sm:p-6">
-            <Pill>{t("Nous rendre visite")}</Pill>
-            <h2 className={`${TITLE} mt-3 text-3xl text-[var(--color-secondary)]`}>{t("Nous trouver")}</h2>
-            <p className="mt-2 text-sm leading-6 text-stone-700">{address}</p>
-            <div className="mt-4">
-              <ButtonLink
-                href={`https://www.google.com/maps/dir/?api=1&destination=${query}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                size="sm"
-                icon={<Navigation className="h-4 w-4" />}
-              >
-                {t("Préparer mon itinéraire")}
-              </ButtonLink>
-            </div>
+    <section id="horaires" className="maison-home maison-section py-20 sm:py-28">
+      <div className="maison-shell">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div><p className="maison-eyebrow"><span className="text-stone-400">03</span>{t("Nous rendre visite")}</p><h2 className="maison-title mt-6 text-4xl leading-[1.12] sm:text-5xl lg:text-6xl">{t("On vous garde une place ?")}</h2></div>
+          <OpenNowBadge hours={hours} closures={closures} />
+        </div>
+        <div className={`mt-12 grid gap-12 lg:gap-20 ${address ? "md:grid-cols-2" : "max-w-2xl"}`}>
+          <div>
+            <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-[0.18em]">{t("Horaires")}</h3>
+            {activeClosure && <p className="mb-5 border-l-2 border-[var(--color-primary)] bg-white/60 px-4 py-3 text-sm leading-6">{activeClosure.message || t("Fermeture exceptionnelle en cours.")}</p>}
+            <ul className="divide-y divide-stone-300/70 border-y border-stone-300/70">
+              {schedule.map((day) => (
+                <li key={day.day} className={`flex items-start justify-between gap-4 py-4 text-sm ${day.isToday ? "font-semibold text-[var(--color-primary)]" : "text-stone-600"}`}>
+                  <span className="flex items-center gap-2">{t(day.label)}{day.isToday && <span className="h-1.5 w-1.5 rounded-full bg-current"><span className="sr-only">{t("Aujourd’hui")}</span></span>}</span>
+                  <span className="text-right tabular-nums">{day.isClosed ? t("Fermé") : day.slots.map((slot) => <span key={`${slot.opensAt}-${slot.closesAt}`} className="block">{slot.opensAt} — {slot.closesAt}</span>)}</span>
+                </li>
+              ))}
+            </ul>
+            <Link href="/reservation" className="maison-text-link mt-7">{t("Choisir votre moment")}<ArrowUpRight className="h-4 w-4" aria-hidden="true" /></Link>
           </div>
+          {address && (
+            <div id="adresse" className="maison-section">
+              <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">{t("Nous trouver")}</h3>
+              <p className="maison-title mt-5 max-w-md text-2xl leading-relaxed">{address}</p>
+              <div className="mt-6 overflow-hidden border border-stone-300 bg-stone-200">
+                <iframe title={`${t("Nous trouver")} — ${restaurant.name}`} src={`https://www.google.com/maps?q=${query}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" className="h-[250px] w-full border-0 sm:h-[280px]" />
+              </div>
+              <a href={`https://www.google.com/maps/dir/?api=1&destination=${query}`} target="_blank" rel="noopener noreferrer" className="maison-text-link mt-6"><Navigation className="h-4 w-4" aria-hidden="true" />{t("Préparer mon itinéraire")}</a>
+            </div>
+          )}
         </div>
       </div>
     </section>
   );
 }
 
-/* --------------------------------------------------------------------- Contact */
 export async function ModernContact({ restaurant }: { restaurant: Restaurant }) {
   const t = await getT();
+  const image = galleryImages(restaurant)[1] ?? restaurant.cover_image_url;
+
   return (
-    <section id="contact" className="bg-stone-50 pb-24 md:pb-32">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-[var(--color-secondary)] px-6 py-14 text-center text-white sm:px-12 md:py-20">
-          <div aria-hidden="true" className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-[var(--color-primary)]/30" />
-          <div aria-hidden="true" className="absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-white/5" />
-          <div className="relative mx-auto max-w-2xl">
-            <Pill dark>{t("À très bientôt")}</Pill>
-            <h2 className={`${TITLE} mt-5 text-4xl sm:text-5xl lg:text-6xl`}>{t("Le plaisir de vous recevoir")}</h2>
-            <p className="mx-auto mt-5 max-w-lg text-white/85">
-              {t("Pour une demande particulière ou pour choisir votre prochain moment à table, notre équipe est à votre écoute.")}
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <ButtonLink href="/reservation" size="lg" icon={<ArrowUpRight className="h-4 w-4" />}>
-                {t("Réserver une table")}
-              </ButtonLink>
-              {restaurant.phone && (
-                <a href={`tel:${restaurant.phone.replace(/\s+/g, "")}`} className="inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-sm font-semibold hover:bg-white/10">
-                  <Phone className="h-4 w-4" /> {restaurant.phone}
-                </a>
-              )}
-              {restaurant.email && (
-                <a href={`mailto:${restaurant.email}`} className="inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-sm font-semibold hover:bg-white/10">
-                  <Mail className="h-4 w-4" /> E-mail
-                </a>
-              )}
-            </div>
-          </div>
+    <section id="contact" className="maison-section relative isolate overflow-hidden bg-[var(--color-secondary)] py-20 text-white sm:py-28">
+      {image && <Image src={image} alt="" fill sizes="100vw" className="-z-20 object-cover" />}
+      <div className="absolute inset-0 -z-10 bg-black/65" />
+      <div className="maison-shell grid items-end gap-10 md:grid-cols-[1.3fr_0.7fr]">
+        <div><p className="maison-eyebrow text-white/75">{t("À très bientôt")}</p><h2 className="maison-title mt-6 max-w-2xl text-4xl leading-[1.12] sm:text-5xl lg:text-6xl">{t("La prochaine fois,")}<br /><span className="italic">{t("c’est à votre table.")}</span></h2></div>
+        <div className="flex flex-col items-start gap-5 md:items-end">
+          <Link href="/reservation" className="maison-button">{t("Réserver une table")}<ArrowUpRight className="h-4 w-4" aria-hidden="true" /></Link>
+          {restaurant.phone && <a href={`tel:${restaurant.phone.replace(/\s+/g, "")}`} className="inline-flex min-h-11 items-center gap-3 text-sm text-white/85 transition-colors hover:text-white"><Phone className="h-4 w-4" aria-hidden="true" />{restaurant.phone}</a>}
+          {restaurant.email && <a href={`mailto:${restaurant.email}`} className="inline-flex min-h-11 max-w-full items-center gap-3 text-sm text-white/85 transition-colors hover:text-white"><Mail className="h-4 w-4 shrink-0" aria-hidden="true" /><span className="break-all">{restaurant.email}</span></a>}
         </div>
       </div>
     </section>

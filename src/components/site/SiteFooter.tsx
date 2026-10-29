@@ -13,12 +13,14 @@ export async function SiteFooter({ restaurant, modern = false }: { restaurant: R
     .join(", ");
 
   return (
-    <footer className={modern ? "bg-[var(--color-secondary)] text-stone-100 [clip-path:polygon(0_4%,100%_0,100%_100%,0_100%)] pt-8 md:pt-12" : "bg-[#1d1c19] text-stone-100"}>
+    <footer className={modern ? "border-t border-white/15 bg-[var(--color-secondary)] text-stone-100" : "bg-[#1d1c19] text-stone-100"}>
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.2fr_0.8fr_0.7fr] md:gap-12 md:py-20 lg:px-8">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">{t("La maison")}</p>
           <Link href="/" className="mt-3 inline-block font-[family-name:var(--font-title)] text-3xl font-normal tracking-tight sm:text-4xl">{restaurant.name}</Link>
-          {restaurant.tagline && <p className="mt-4 max-w-sm text-sm leading-6 text-white/80">{L(restaurant.tagline, restaurant.tagline_en)}</p>}
+          {modern ? (
+            <p className="mt-4 max-w-sm text-sm leading-6 text-white/70">{t("Une table, une cuisine, un moment à partager.")}</p>
+          ) : restaurant.tagline && <p className="mt-4 max-w-sm text-sm leading-6 text-white/80">{L(restaurant.tagline, restaurant.tagline_en)}</p>}
         </div>
 
         <div className="space-y-4 text-sm text-white/80">
