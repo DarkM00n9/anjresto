@@ -5,6 +5,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { QuoteDocument } from "@/components/superadmin/QuoteDocument";
 import { QuoteActions } from "@/components/superadmin/QuoteActions";
 import { QuoteSignPanel } from "@/components/superadmin/QuoteSignPanel";
+import { computeQuoteHash } from "@/lib/quote-hash";
+import { quoteOtpRequired } from "@/lib/quote-otp";
 import type { CompanySettings, Quote } from "@/lib/quotes";
 
 export default async function QuotePage({ params }: { params: Promise<{ quoteId: string }> }) {
@@ -16,6 +18,8 @@ export default async function QuotePage({ params }: { params: Promise<{ quoteId:
   ]);
   if (!quote) notFound();
   const q = quote as Quote;
+  const co = (company ?? { legal_name: "NJ INVEST", legal_form: "SASU", city: "Marseille", vat_rate: 20 }) as CompanySettings;
+  const integrity = q.signed_hash ? computeQuoteHash(q, co) === q.signed_hash : undefined;
   const canSign = q.status !== "signed" && q.status !== "refused";
 
   return (
@@ -27,14 +31,14 @@ export default async function QuotePage({ params }: { params: Promise<{ quoteId:
       {q.sent_at && q.status !== "signed" && (
         <p className="mb-3 text-xs text-slate-700 print:hidden">Envoyé par email le {new Date(q.sent_at).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Paris" })}.</p>
       )}
-      <QuoteDocument quote={q} company={(company ?? { legal_name: "NJ INVEST", legal_form: "SASU", city: "Marseille", vat_rate: 20 }) as CompanySettings} />
+      <QuoteDocument quote={q} company={co} integrity={integrity} />
       {canSign && (
         <details className="mt-4 print:hidden">
           <summary className="inline-flex min-h-12 cursor-pointer list-none items-center gap-2 rounded-full bg-emerald-600 px-5 text-sm font-semibold text-white hover:bg-emerald-700">
             <PenLine className="h-4 w-4" /> Faire signer le client maintenant
           </summary>
           <div className="mt-3">
-            <QuoteSignPanel token={q.public_token} defaultName={q.client_representative ?? ""} method="in_person" />
+            <QuoteSignPanel token={q.public_token} defaultName={q.client_representative ?? ""} method="in_person" otpRequired={quoteOtpRequired()} />
           </div>
         </details>
       )}

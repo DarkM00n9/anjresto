@@ -52,3 +52,17 @@ export function quoteSignedEmail(quote: Quote, company: CompanySettings, link: s
     ),
   };
 }
+
+export function quoteCodeEmail(quote: Quote, company: CompanySettings, code: string) {
+  return {
+    subject: `Votre code de signature : ${code}`,
+    html: layout(
+      "Code de signature",
+      `<p style="margin:0 0 12px;">Bonjour,</p>
+<p style="margin:0 0 12px;">Voici votre code pour signer le devis <strong>${esc(quote.number)}</strong> de ${esc(company.legal_name)} :</p>
+<p style="margin:18px 0;text-align:center;font-size:34px;font-weight:700;letter-spacing:10px;color:#4f46e5;">${esc(code)}</p>
+<p style="margin:0;color:#475569;font-size:13px;">Ce code est valable 10 minutes et ne peut être utilisé qu'une seule fois. Si vous n'êtes pas à l'origine de cette demande, ignorez cet email : rien ne sera signé.</p>
+${signature(company)}`,
+    ),
+  };
+}

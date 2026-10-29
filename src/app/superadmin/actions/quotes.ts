@@ -105,6 +105,7 @@ export async function createQuote(input: QuoteInput) {
       client_phone: text(input.client_phone, 30),
       valid_until: isoDate(input.valid_until),
       lines,
+      vat_rate: Number((await admin.from("company_settings").select("vat_rate").eq("id", 1).maybeSingle()).data?.vat_rate ?? 20),
       deposit_percent: Math.min(100, Math.max(0, num(input.deposit_percent))),
       monthly_price: Math.max(0, num(input.monthly_price)),
       monthly_description: text(input.monthly_description, 600),

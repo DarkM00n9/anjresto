@@ -1,8 +1,8 @@
 import { computeTotals, formatDateFR, formatDateTimeFR, formatEUR, type CompanySettings, type Quote } from "@/lib/quotes";
 
 /** Devis prêt à imprimer (le menu du superadmin est masqué à l'impression). */
-export function QuoteDocument({ quote, company }: { quote: Quote; company: CompanySettings }) {
-  const vatRate = Number(company.vat_rate) || 0;
+export function QuoteDocument({ quote, company, integrity }: { quote: Quote; company: CompanySettings; integrity?: boolean }) {
+  const vatRate = Number(quote.vat_rate ?? company.vat_rate) || 0;
   const t = computeTotals(quote, vatRate);
   const legalLine = [
     `${company.legal_name} — ${company.legal_form}${company.share_capital ? ` au capital de ${company.share_capital}` : ""}`,
@@ -107,15 +107,15 @@ export function QuoteDocument({ quote, company }: { quote: Quote; company: Compa
         <div className="mt-2 grid grid-cols-2 gap-4">
           <div className="h-28 rounded-xl border border-slate-300 p-3 text-xs text-slate-600">{company.legal_name}</div>
           <div className="min-h-28 rounded-xl border border-slate-300 p-3 text-xs text-slate-600">
-            {quote.signature_data ? (
+            {quote.signed_at ? (
               <>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={quote.signature_data} alt={`Signature de ${quote.signed_name ?? "le client"}`} className="h-16 w-auto" />
-                <p className="mt-1 text-slate-800">
-                  Signé par <strong>{quote.signed_name}</strong>
-                  {quote.signed_at && <> le {formatDateTimeFR(quote.signed_at)}</>}
+                <p className="break-words text-3xl leading-tight text-slate-900" style={{ fontFamily: '"Segoe Script","Snell Roundhand","Brush Script MT","Apple Chancery",cursive' }}>
+                  {quote.signed_name}
                 </p>
-                <p className="text-[11px]">Bon pour accord ({quote.signed_method === "in_person" ? "signature sur place" : "signature en ligne"})</p>
+                <p className="mt-1 text-slate-800">
+                  Signé électroniquement le {formatDateTimeFR(quote.signed_at)}
+                </p>
+                <p className="text-[11px]">Bon pour accord ({quote.signed_method === "in_person" ? "signature sur place" : "signature à distance"})</p>
               </>
             ) : (
               "Le client"
@@ -123,6 +123,16 @@ export function QuoteDocument({ quote, company }: { quote: Quote; company: Compa
           </div>
         </div>
       </section>
+
+      {quote.signed_at && quote.signed_hash && (
+        <section className="mt-6 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-xs leading-5 text-emerald-950">
+          <p className="font-bold uppercase tracking-wide">Certificat de signature électronique</p>
+          <p className="mt-1">Signataire : {quote.signed_name}{quote.signed_email && <> ({quote.signed_email}{quote.signed_verified ? ", email vérifié par code" : ", email confirmé"})</>}</p>
+          <p>Date et heure : {formatDateTimeFR(quote.signed_at)} (heure de Paris)</p>
+          <p className="break-all">Empreinte SHA-256 du devis : {quote.signed_hash}</p>
+          {integrity !== undefined && <p className="font-semibold">{integrity ? "✓ Le contenu du devis n'a pas été modifié depuis la signature." : "⚠ Le contenu du devis a été modifié après la signature."}</p>}
+        </section>
+      )}
 
       <footer className="mt-8 border-t border-slate-200 pt-3 text-center text-[11px] text-slate-600">{legalLine.join(" · ")}</footer>
     </article>

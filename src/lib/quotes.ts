@@ -45,7 +45,10 @@ export interface Quote {
   status: QuoteStatus;
   public_token: string;
   sent_at: string | null;
-  signature_data: string | null;
+  vat_rate: number | null;
+  signed_hash: string | null;
+  signed_email: string | null;
+  signed_verified: boolean;
   signed_name: string | null;
   signed_at: string | null;
   signed_method: "in_person" | "remote" | null;
