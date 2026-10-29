@@ -25,9 +25,9 @@ export default async function ClientsPage() {
   // Les réservations arrivent de la plus récente à la plus ancienne.
   for (const r of reservations ?? []) {
     if (r.status === "cancelled" || r.status === "refused") continue;
-    const c =
+    const c: ClientSummary =
       clients.get(r.customer_phone) ??
-      ({
+      {
         phone: r.customer_phone,
         name: r.customer_name,
         email: r.customer_email,
@@ -37,7 +37,7 @@ export default async function ClientsPage() {
         note: noteByPhone.get(r.customer_phone)?.note ?? "",
         isVip: noteByPhone.get(r.customer_phone)?.is_vip ?? false,
         history: [],
-      } satisfies ClientSummary);
+      };
     if (r.status === "no_show") c.noShows += 1;
     else c.visits += 1;
     if (c.history.length < 5) {
