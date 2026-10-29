@@ -9,8 +9,8 @@ import { requireAdminContext } from "./guard";
 /** Traduit en anglais tout le contenu du restaurant (site, carte, menu du jour) en une fois. */
 export async function translateAllContent(): Promise<{ success: boolean; count: number; error?: string }> {
   const { restaurant } = await requireAdminContext(OWNER_ONLY);
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return { success: false, count: 0, error: "La traduction automatique n'est pas activée (clé ANTHROPIC_API_KEY manquante)." };
+  if (!process.env.DEEPL_API_KEY && !process.env.ANTHROPIC_API_KEY) {
+    return { success: false, count: 0, error: "La traduction automatique n'est pas activée (clé DEEPL_API_KEY ou ANTHROPIC_API_KEY manquante)." };
   }
   const supabase = await createClient();
 

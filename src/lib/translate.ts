@@ -1,13 +1,41 @@
 import "server-only";
 
+/** DeepL (offre gratuite : clé se terminant par ":fx"). Renvoie un objet vide en cas d'erreur. */
+async function translateWithDeepL(key: string, entries: [string, string | null | undefined][]): Promise<Record<string, string>> {
+  try {
+    const host = key.endsWith(":fx") ? "api-free.deepl.com" : "api.deepl.com";
+    const res = await fetch(`https://${host}/v2/translate`, {
+      method: "POST",
+      headers: { "content-type": "application/json", Authorization: `DeepL-Auth-Key ${key}` },
+      body: JSON.stringify({ text: entries.map(([, v]) => v), source_lang: "FR", target_lang: "EN-GB" }),
+    });
+    if (!res.ok) return {};
+    const body = (await res.json()) as { translations?: { text: string }[] };
+    const out: Record<string, string> = {};
+    entries.forEach(([k], i) => {
+      const text = body.translations?.[i]?.text;
+      if (text) out[k] = text;
+    });
+    return out;
+  } catch {
+    return {};
+  }
+}
+
 /**
- * Traduit des textes de restaurant du français vers l'anglais via l'API Claude.
- * Sans ANTHROPIC_API_KEY (ou en cas d'erreur), renvoie un objet vide : le site reste en français.
+ * Traduit des textes de restaurant du français vers l'anglais.
+ * Utilise DeepL (DEEPL_API_KEY) s'il est configuré, sinon l'API Claude (ANTHROPIC_API_KEY).
+ * Sans clé (ou en cas d'erreur), renvoie un objet vide : le site reste en français.
  */
 export async function translateToEnglish(texts: Record<string, string | null | undefined>): Promise<Record<string, string>> {
-  const key = process.env.ANTHROPIC_API_KEY;
   const entries = Object.entries(texts).filter(([, v]) => v && v.trim());
-  if (!key || entries.length === 0) return {};
+  if (entries.length === 0) return {};
+
+  const deepl = process.env.DEEPL_API_KEY;
+  if (deepl) return translateWithDeepL(deepl, entries);
+
+  const key = process.env.ANTHROPIC_API_KEY;
+  if (!key) return {};
 
   try {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
