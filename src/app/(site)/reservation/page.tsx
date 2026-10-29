@@ -27,7 +27,7 @@ export default async function ReservationPage() {
 
 
   return (
-    <Section spacing="py-10 md:py-16" className={modern ? "relative isolate overflow-hidden bg-stone-50" : "bg-stone-200"}>
+    <Section spacing="py-10 md:py-16" className={modern ? "maison-home relative isolate overflow-hidden" : "bg-stone-200"}>
       {modern && <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[var(--color-secondary)] [clip-path:polygon(0_82%,100%_70%,100%_100%,0_100%)] lg:[clip-path:polygon(58%_0,100%_0,100%_100%,42%_100%)]" />}
       <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.86fr_1.14fr] lg:gap-12">
         <div className="lg:pt-3">
