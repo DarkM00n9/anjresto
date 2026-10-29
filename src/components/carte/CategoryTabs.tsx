@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Category } from "@/types/database";
+import { useT } from "@/components/site/LangProvider";
 
 interface CategoryTabsProps {
   categories: Category[];
 }
 
 export function CategoryTabs({ categories }: CategoryTabsProps) {
+  const t = useT();
   const [activeId, setActiveId] = useState(categories[0]?.id);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -35,7 +37,7 @@ export function CategoryTabs({ categories }: CategoryTabsProps) {
   if (categories.length === 0) return null;
 
   return (
-    <nav aria-label="Catégories de la carte" className="sticky top-[58px] z-20 overflow-x-auto border-b border-black/[0.08] bg-white/95 backdrop-blur-xl sm:top-[61px]">
+    <nav aria-label={t("Catégories de la carte")} className="sticky top-[58px] z-20 overflow-x-auto border-b border-black/[0.08] bg-white/95 backdrop-blur-xl sm:top-[61px]">
       <ul className="mx-auto flex min-w-max max-w-7xl gap-7 px-4 sm:gap-9 sm:px-6 lg:px-8">
         {categories.map((category) => (
           <li key={category.id}>

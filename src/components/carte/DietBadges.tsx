@@ -1,5 +1,8 @@
+"use client";
+
 import type { MenuItem } from "@/types/database";
 import { Badge } from "@/components/ui/Badge";
+import { useT } from "@/components/site/LangProvider";
 import { Flame, Home, Leaf, Sprout, Wheat, type LucideIcon } from "lucide-react";
 
 const DIET_FLAGS: { key: keyof MenuItem; label: string; icon: LucideIcon }[] = [
@@ -11,6 +14,7 @@ const DIET_FLAGS: { key: keyof MenuItem; label: string; icon: LucideIcon }[] = [
 ];
 
 export function DietBadges({ item }: { item: MenuItem }) {
+  const t = useT();
   const active = DIET_FLAGS.filter((flag) => item[flag.key]);
   if (active.length === 0) return null;
 
@@ -18,7 +22,7 @@ export function DietBadges({ item }: { item: MenuItem }) {
     <div className="flex flex-wrap gap-1.5">
       {active.map((flag) => (
         <Badge key={flag.key} tone="primary">
-          <flag.icon className="h-3 w-3" aria-hidden="true" /> {flag.label}
+          <flag.icon className="h-3 w-3" aria-hidden="true" /> {t(flag.label)}
         </Badge>
       ))}
     </div>

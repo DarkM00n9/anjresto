@@ -1,8 +1,11 @@
 import type { Closure, OpeningHour } from "@/types/database";
 import { isOpenNow } from "@/lib/opening-hours";
 import { getActiveClosure } from "@/lib/closures";
+import { getT } from "@/lib/lang";
 
-export function OpenNowBadge({ hours, closures = [] }: { hours: OpeningHour[]; closures?: Closure[] }) {
+
+export async function OpenNowBadge({ hours, closures = [] }: { hours: OpeningHour[]; closures?: Closure[] }) {
+  const t = await getT();
   const open = getActiveClosure(closures) ? false : isOpenNow(hours);
 
   return (
@@ -12,7 +15,7 @@ export function OpenNowBadge({ hours, closures = [] }: { hours: OpeningHour[]; c
       }`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${open ? "bg-green-600" : "bg-red-600"}`} />
-      {open ? "Ouvert maintenant" : "Fermé"}
+      {open ? t("Ouvert maintenant") : t("Fermé")}
     </span>
   );
 }

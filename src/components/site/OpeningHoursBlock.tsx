@@ -4,13 +4,16 @@ import { OpenNowBadge } from "./OpenNowBadge";
 import { groupHoursByDay } from "@/lib/opening-hours";
 import { getActiveClosure } from "@/lib/closures";
 import { Card } from "@/components/ui/Card";
+import { getT } from "@/lib/lang";
+
 
 interface OpeningHoursBlockProps {
   hours: OpeningHour[];
   closures: Closure[];
 }
 
-export function OpeningHoursBlock({ hours, closures }: OpeningHoursBlockProps) {
+export async function OpeningHoursBlock({ hours, closures }: OpeningHoursBlockProps) {
+  const t = await getT();
   const schedule = groupHoursByDay(hours);
   const activeClosure = getActiveClosure(closures);
 
@@ -20,19 +23,19 @@ export function OpeningHoursBlock({ hours, closures }: OpeningHoursBlockProps) {
         <div className="flex flex-col items-start gap-5 lg:sticky lg:top-28">
           <div>
             <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-primary)]">
-              <span className="h-px w-8 bg-[var(--color-primary)]" />À votre rythme
+              <span className="h-px w-8 bg-[var(--color-primary)]" />{t("À votre rythme")}
             </p>
             <h2 className="mt-6 font-[family-name:var(--font-title)] text-4xl font-normal tracking-[-0.035em] text-[var(--color-secondary)] sm:text-5xl">
-              Horaires
+              {t("Horaires")}
             </h2>
           </div>
           <OpenNowBadge hours={hours} closures={closures} />
-          <p className="max-w-sm text-sm leading-6 text-stone-600">Nous serons ravis de vous accueillir. Pensez à réserver votre table pour le créneau qui vous convient.</p>
+          <p className="max-w-sm text-sm leading-6 text-stone-600">{t("Nous serons ravis de vous accueillir. Pensez à réserver votre table pour le créneau qui vous convient.")}</p>
         </div>
 
         {activeClosure && (
           <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 lg:col-start-2">
-            {activeClosure.message || "Fermeture exceptionnelle en cours."}
+            {activeClosure.message || t("Fermeture exceptionnelle en cours.")}
           </div>
         )}
 
@@ -45,10 +48,10 @@ export function OpeningHoursBlock({ hours, closures }: OpeningHoursBlockProps) {
                   day.isToday ? "font-semibold text-[var(--color-primary)]" : "text-stone-700"
                 }`}
               >
-                <span>{day.label}</span>
+                <span>{t(day.label)}</span>
                 <span className="text-right">
                   {day.isClosed
-                    ? "Fermé"
+                    ? t("Fermé")
                     : day.slots.map((slot) => `${slot.opensAt} – ${slot.closesAt}`).join(" · ")}
                 </span>
               </li>

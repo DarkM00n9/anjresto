@@ -1,7 +1,7 @@
 // Types manuels correspondant au schéma Supabase (supabase/migrations/0001_init.sql).
 // À remplacer par `supabase gen types typescript` une fois le projet lié à la CLI.
 
-export type AppRole = "superadmin" | "owner";
+export type AppRole = "superadmin" | "owner" | "manager" | "staff";
 
 export type Allergen =
   | "gluten"

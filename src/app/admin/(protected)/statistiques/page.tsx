@@ -1,3 +1,4 @@
+import { requireAdminContext } from "@/app/admin/actions/guard";
 import { Users, CalendarCheck, UserX, TrendingUp } from "lucide-react";
 import { requireCurrentRestaurant } from "@/lib/get-current-restaurant";
 import { listReservationsInRange } from "@/lib/get-reservations";
@@ -21,6 +22,7 @@ function Bar({ label, value, max, suffix }: { label: string; value: number; max:
 }
 
 export default async function StatisticsPage() {
+  await requireAdminContext();
   const restaurant = await requireCurrentRestaurant();
   const today = todayInParis();
   const from = addDays(today, -89);

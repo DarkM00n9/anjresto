@@ -1,16 +1,21 @@
+"use client";
+
 import Image from "next/image";
 import type { MenuItem } from "@/types/database";
 import { DietBadges } from "./DietBadges";
 import { AllergenList } from "./AllergenList";
+import { useT } from "@/components/site/LangProvider";
+
 
 export function MenuItemCard({ item }: { item: MenuItem }) {
+  const t = useT();
   if (!item.is_available) {
     return (
       <li className="flex gap-4 py-5 opacity-55 sm:py-6">
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-4">
             <h3 className="font-[family-name:var(--font-title)] text-lg font-medium text-stone-700">{item.name}</h3>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-600">Épuisé</span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-600">{t("Épuisé")}</span>
           </div>
         </div>
       </li>

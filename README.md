@@ -156,3 +156,9 @@ Migration à exécuter dans Supabase (SQL Editor) : `0012_reservation_capacity.s
 - **Site** : filtres de la carte (végétarien, vegan, sans gluten), export PDF de la carte (impression), bloc note Google (à renseigner dans Infos), ajout au calendrier après réservation, inscription en liste d'attente quand c'est complet.
 - **Superadmin** : tableau de bord global (revenu mensuel, impayés, inactifs), facturation par restaurant, duplication d'un restaurant modèle.
 - **À faire côté vous** : clé Resend + domaine vérifié (`RESEND_API_KEY`, `RESEND_FROM_EMAIL`) pour que les e-mails partent vraiment ; déploiement Vercel avec `CRON_SECRET`.
+
+## Équipe et langues
+
+- Migration `0014_team_roles.sql` à exécuter : ajoute les rôles `manager` (gérant) et `staff` (employé).
+- `/admin/equipe` (propriétaire uniquement) : inviter par e-mail, changer le rôle, retirer l'accès. Le gérant n'a pas accès à Infos ni Équipe ; l'employé ne voit que les réservations.
+- Site public bilingue FR/EN : sélecteur dans l'en-tête (cookie `lang`). Dictionnaire dans `src/lib/i18n.ts` (le français sert de clé ; une chaîne absente reste en français). Les contenus saisis par le restaurant (plats, descriptions) restent dans leur langue d'origine.

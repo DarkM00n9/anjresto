@@ -1,3 +1,4 @@
+import { requireAdminContext } from "@/app/admin/actions/guard";
 import { requireCurrentRestaurant } from "@/lib/get-current-restaurant";
 import { createClient } from "@/lib/supabase/server";
 import { AdminPage, AdminPageHeader } from "@/components/admin/AdminPage";
@@ -5,6 +6,7 @@ import { ClientCard } from "@/components/admin/ClientCard";
 import type { CustomerNote } from "@/types/database";
 
 export default async function ClientsPage() {
+  await requireAdminContext();
   const restaurant = await requireCurrentRestaurant();
   const supabase = await createClient();
   const [{ data: reservations }, { data: notes }] = await Promise.all([

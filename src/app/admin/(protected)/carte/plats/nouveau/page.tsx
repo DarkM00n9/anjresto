@@ -1,3 +1,4 @@
+import { requireAdminContext } from "@/app/admin/actions/guard";
 import { requireCurrentRestaurant } from "@/lib/get-current-restaurant";
 import { getMenu } from "@/lib/get-menu";
 import { MenuItemForm } from "@/components/admin/MenuItemForm";
@@ -11,6 +12,7 @@ export default async function NewMenuItemPage({
 }: {
   searchParams: Promise<{ categorie?: string }>;
 }) {
+  await requireAdminContext();
   const restaurant = await requireCurrentRestaurant();
   const { categorie } = await searchParams;
   const { categories } = await getMenu(restaurant.id);

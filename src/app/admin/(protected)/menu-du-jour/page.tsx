@@ -1,9 +1,11 @@
+import { requireAdminContext } from "@/app/admin/actions/guard";
 import { requireCurrentRestaurant } from "@/lib/get-current-restaurant";
 import { getActiveDailyMenu } from "@/lib/get-menu";
 import { DailyMenuForm } from "@/components/admin/DailyMenuForm";
 import { AdminPage, AdminPageHeader } from "@/components/admin/AdminPage";
 
 export default async function AdminDailyMenuPage() {
+  await requireAdminContext();
   const restaurant = await requireCurrentRestaurant();
   const dailyMenu = await getActiveDailyMenu(restaurant.id);
 

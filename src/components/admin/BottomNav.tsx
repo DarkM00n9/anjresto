@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, CalendarDays, UtensilsCrossed, Sun, Clock, Info, QrCode, MoreHorizontal, Users, BarChart3, type LucideIcon } from "lucide-react";
+import { Home, CalendarDays, UtensilsCrossed, Sun, Clock, Info, QrCode, MoreHorizontal, Users, UserCog, BarChart3, type LucideIcon } from "lucide-react";
+import { canSeeSection } from "@/lib/permissions";
+import type { AppRole } from "@/types/database";
 
 const ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/admin", label: "Accueil", icon: Home },
@@ -12,21 +14,23 @@ const ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/admin/horaires", label: "Horaires", icon: Clock },
   { href: "/admin/clients", label: "Clients", icon: Users },
   { href: "/admin/statistiques", label: "Stats", icon: BarChart3 },
+  { href: "/admin/equipe", label: "Équipe", icon: UserCog },
   { href: "/admin/infos", label: "Infos", icon: Info },
   { href: "/admin/qr-code", label: "QR code", icon: QrCode },
 ];
 
-export function BottomNav() {
+export function BottomNav({ role }: { role: AppRole }) {
   const pathname = usePathname();
   // En local, l'URL peut conserver le préfixe /r/{slug} : on le retire pour comparer.
   const path = pathname.replace(/^\/r\/[^/]+/, "") || "/";
-  const secondaryItems = ITEMS.slice(4);
+  const items = ITEMS.filter((item) => canSeeSection(role, item.href));
+  const secondaryItems = items.slice(4);
   const secondaryActive = secondaryItems.some((item) => path.startsWith(item.href));
 
   return (
     <nav aria-label="Navigation d’administration" className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-950 bg-slate-900 px-1 py-2 shadow-[0_-8px_30px_-12px_rgba(15,23,42,0.5)] sm:px-4 sm:py-3">
       <div className="mx-auto flex w-full max-w-4xl justify-between gap-1 sm:justify-center sm:gap-2">
-      {ITEMS.map((item) => {
+      {items.map((item) => {
         const active = item.href === "/admin" ? path === "/admin" : path.startsWith(item.href);
         const isSecondary = secondaryItems.some((secondaryItem) => secondaryItem.href === item.href);
         const Icon = item.icon;
@@ -48,7 +52,7 @@ export function BottomNav() {
           </Link>
         );
       })}
-      <details className="relative shrink-0 sm:hidden">
+      <details className={`relative shrink-0 sm:hidden ${secondaryItems.length === 0 ? "hidden" : ""}`}>
         <summary
           aria-label="Plus de rubriques"
           className={`flex min-w-[54px] cursor-pointer list-none flex-col items-center gap-1 rounded-xl px-2 py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${

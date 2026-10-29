@@ -2,13 +2,16 @@ import Image from "next/image";
 import type { Restaurant } from "@/types/database";
 import { Section } from "@/components/ui/Section";
 import type { LayoutPreset } from "@/lib/layout-presets";
+import { getT } from "@/lib/lang";
+
 
 interface AboutProps {
   restaurant: Restaurant;
   preset: LayoutPreset;
 }
 
-export function About({ restaurant, preset }: AboutProps) {
+export async function About({ restaurant, preset }: AboutProps) {
+  const t = await getT();
   if (!restaurant.description && restaurant.gallery_urls.length === 0) return null;
   const imageKey = (url: string) => {
     try {
@@ -27,10 +30,10 @@ export function About({ restaurant, preset }: AboutProps) {
       <div className={`grid gap-12 ${images.length ? "md:grid-cols-[0.78fr_1.22fr] md:items-center md:gap-16" : "md:max-w-3xl"}`}>
         <div className="py-2">
           <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-primary)]">
-            <span className="h-px w-8 bg-[var(--color-primary)]" />Notre histoire
+            <span className="h-px w-8 bg-[var(--color-primary)]" />{t("Notre histoire")}
           </p>
           <h2 className="mt-6 font-[family-name:var(--font-title)] text-4xl font-normal leading-[1.05] tracking-[-0.035em] text-[var(--color-secondary)] sm:text-5xl lg:text-6xl">
-            L’esprit de la maison
+            {t("L’esprit de la maison")}
           </h2>
           {restaurant.description && (
             <p className="mt-7 max-w-xl whitespace-pre-line border-l border-[var(--color-primary)]/50 pl-5 text-base leading-8 text-stone-700 sm:text-lg sm:leading-8">{restaurant.description}</p>

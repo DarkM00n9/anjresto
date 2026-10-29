@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { restaurantInfoSchema, type RestaurantInfoInput } from "@/lib/schemas";
 import { requireAdminContext } from "./guard";
+import { OWNER_ONLY } from "@/lib/permissions";
 
 export async function updateRestaurantInfo(input: RestaurantInfoInput) {
-  const { restaurant } = await requireAdminContext();
+  const { restaurant } = await requireAdminContext(OWNER_ONLY);
   const data = restaurantInfoSchema.parse(input);
   const supabase = await createClient();
 

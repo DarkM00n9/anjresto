@@ -6,6 +6,8 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { DemoBanner } from "@/components/site/DemoBanner";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
+import { LangProvider } from "@/components/site/LangProvider";
+import { getLang } from "@/lib/lang";
 import { SuspendedPage } from "@/components/site/SuspendedPage";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -24,15 +26,18 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     return <SuspendedPage />;
   }
 
+  const lang = await getLang();
   const font = resolveTitleFont(restaurant.theme.font_title);
 
   return (
     <div className={`${font.variable} bg-stone-100`} style={themeCssVars(restaurant)}>
+      <LangProvider lang={lang}>
       <ScrollProgress />
       {restaurant.status === "demo" && <DemoBanner />}
       <SiteHeader restaurant={restaurant} />
       {children}
       <SiteFooter restaurant={restaurant} />
+      </LangProvider>
     </div>
   );
 }

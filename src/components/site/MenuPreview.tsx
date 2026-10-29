@@ -2,13 +2,16 @@ import type { Category, MenuItem } from "@/types/database";
 import { Section } from "@/components/ui/Section";
 import { ButtonLink } from "@/components/ui/Button";
 import { ArrowUpRight } from "lucide-react";
+import { getT } from "@/lib/lang";
+
 
 interface MenuPreviewProps {
   categories: Category[];
   items: MenuItem[];
 }
 
-export function MenuPreview({ categories, items }: MenuPreviewProps) {
+export async function MenuPreview({ categories, items }: MenuPreviewProps) {
+  const t = await getT();
   if (categories.length === 0 && items.length === 0) return null;
 
   const categoryNames = new Map(categories.map((category) => [category.id, category.name]));
@@ -27,13 +30,13 @@ export function MenuPreview({ categories, items }: MenuPreviewProps) {
       <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
         <div className="flex flex-col items-start">
           <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-primary)]">
-            <span className="h-px w-8 bg-[var(--color-primary)]" />La carte
+            <span className="h-px w-8 bg-[var(--color-primary)]" />{t("La carte")}
           </p>
           <h2 className="mt-6 max-w-md font-[family-name:var(--font-title)] text-4xl font-normal leading-[1.05] tracking-[-0.035em] text-[var(--color-secondary)] sm:text-5xl lg:text-6xl">
-            Un avant-goût de la maison
+            {t("Un avant-goût de la maison")}
           </h2>
           <p className="mt-6 max-w-md text-base leading-7 text-stone-700">
-            Découvrez quelques suggestions, puis parcourez la carte complète et ses menus du moment.
+            {t("Découvrez quelques suggestions, puis parcourez la carte complète et ses menus du moment.")}
           </p>
 
           {categories.length > 0 && (
@@ -46,7 +49,7 @@ export function MenuPreview({ categories, items }: MenuPreviewProps) {
 
           <div className="mt-9 hidden lg:block">
             <ButtonLink href="/carte" variant="outline" icon={<ArrowUpRight className="h-4 w-4" />}>
-              Découvrir toute la carte
+              {t("Découvrir toute la carte")}
             </ButtonLink>
           </div>
         </div>
@@ -91,7 +94,7 @@ export function MenuPreview({ categories, items }: MenuPreviewProps) {
       </div>
       <div className="mt-9 lg:hidden">
         <ButtonLink href="/carte" variant="outline" icon={<ArrowUpRight className="h-4 w-4" />}>
-          Découvrir toute la carte
+          {t("Découvrir toute la carte")}
         </ButtonLink>
       </div>
     </Section>

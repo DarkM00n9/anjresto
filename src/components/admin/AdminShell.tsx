@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 import Image from "next/image";
-import type { Restaurant } from "@/types/database";
+import type { AppRole, Restaurant } from "@/types/database";
 import { BottomNav } from "./BottomNav";
 import { SignOutButton } from "./SignOutButton";
 import { NewReservationAlert } from "./NewReservationAlert";
@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/Badge";
 
 interface AdminShellProps extends PropsWithChildren {
   restaurant: Restaurant;
+  role: AppRole;
 }
 
-export function AdminShell({ restaurant, children }: AdminShellProps) {
+export function AdminShell({ restaurant, role, children }: AdminShellProps) {
   return (
     <div className="flex min-h-screen flex-col bg-slate-200">
       <header className="sticky top-0 z-30 border-b border-slate-950 bg-slate-900 px-4 py-3 shadow-lg shadow-slate-900/20 sm:px-6">
@@ -44,7 +45,7 @@ export function AdminShell({ restaurant, children }: AdminShellProps) {
         </div>
       </header>
       <main className="page-enter mx-auto flex w-full max-w-6xl flex-1 flex-col pb-24">{children}</main>
-      <BottomNav />
+      <BottomNav role={role} />
     </div>
   );
 }

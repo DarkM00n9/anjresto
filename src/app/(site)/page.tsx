@@ -6,7 +6,6 @@ import { buildRestaurantJsonLd } from "@/lib/seo";
 import { Hero } from "@/components/site/Hero";
 import { About } from "@/components/site/About";
 import { MenuPreview } from "@/components/site/MenuPreview";
-import { GoogleReviews } from "@/components/site/GoogleReviews";
 import { OpeningHoursBlock } from "@/components/site/OpeningHoursBlock";
 import { LocationMap } from "@/components/site/LocationMap";
 import { ContactSection } from "@/components/site/ContactSection";
@@ -33,7 +32,6 @@ export default async function HomePage() {
       <Hero restaurant={restaurant} preset={preset} />
       <Reveal><About restaurant={restaurant} preset={preset} /></Reveal>
       <Reveal><MenuPreview categories={categories} items={items} /></Reveal>
-      <Reveal><GoogleReviews restaurant={restaurant} /></Reveal>
       <Reveal><OpeningHoursBlock hours={hours} closures={closures} /></Reveal>
       <Reveal><LocationMap restaurant={restaurant} preset={preset} /></Reveal>
       <Reveal><ContactSection restaurant={restaurant} /></Reveal>

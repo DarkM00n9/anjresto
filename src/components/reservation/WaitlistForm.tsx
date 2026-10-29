@@ -5,6 +5,7 @@ import { BellRing, CheckCircle2 } from "lucide-react";
 import { joinWaitlist } from "@/app/actions/public-reservations";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { useT } from "@/components/site/LangProvider";
 
 interface Props {
   restaurantId: string;
@@ -14,6 +15,7 @@ interface Props {
 
 /** Affichée quand un jour est complet : le client s'inscrit et reçoit un e-mail si une table se libère. */
 export function WaitlistForm({ restaurantId, date, partySize }: Props) {
+  const t = useT();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -25,7 +27,7 @@ export function WaitlistForm({ restaurantId, date, partySize }: Props) {
   if (done) {
     return (
       <p className="flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm font-medium text-emerald-900">
-        <CheckCircle2 className="h-5 w-5 shrink-0" /> Vous êtes sur liste d&apos;attente. Nous vous préviendrons si une table se libère.
+        <CheckCircle2 className="h-5 w-5 shrink-0" /> {t("Vous êtes sur liste d'attente. Nous vous préviendrons si une table se libère.")}
       </p>
     );
   }
@@ -42,9 +44,9 @@ export function WaitlistForm({ restaurantId, date, partySize }: Props) {
   return (
     <div className="mt-3 space-y-3 rounded-xl border border-amber-300 bg-amber-50 p-4">
       <p className="flex items-center gap-2 text-sm font-semibold text-amber-900">
-        <BellRing className="h-4 w-4" /> Complet ? Rejoignez la liste d&apos;attente
+        <BellRing className="h-4 w-4" /> {t("Complet ? Rejoignez la liste d'attente")}
       </p>
-      <p className="text-xs text-amber-900">Si une table se libère ce jour-là, vous recevez un e-mail pour réserver en premier.</p>
+      <p className="text-xs text-amber-900">{t("Si une table se libère ce jour-là, vous recevez un e-mail pour réserver en premier.")}</p>
       <input
         type="text"
         value={honeypot}
@@ -54,14 +56,14 @@ export function WaitlistForm({ restaurantId, date, partySize }: Props) {
         aria-hidden="true"
         className="absolute -left-[9999px] h-px w-px opacity-0"
       />
-      <Input id="wl-name" label="Nom" value={name} onChange={(e) => setName(e.target.value)} />
+      <Input id="wl-name" label={t("Nom")} value={name} onChange={(e) => setName(e.target.value)} />
       <div className="grid gap-3 sm:grid-cols-2">
-        <Input id="wl-phone" label="Téléphone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        <Input id="wl-email" label="E-mail (pour être prévenu)" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <Input id="wl-phone" label={t("Téléphone")} type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        <Input id="wl-email" label={t("E-mail (pour être prévenu)")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
       </div>
       {error && <p role="alert" className="text-xs font-medium text-red-700">{error}</p>}
       <Button type="button" variant="primary" loading={pending} disabled={pending || !name || !phone || !email} onClick={submit}>
-        Me prévenir
+        {t("Me prévenir")}
       </Button>
     </div>
   );

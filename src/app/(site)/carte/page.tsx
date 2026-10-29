@@ -8,6 +8,8 @@ import { DailySpecialBanner } from "@/components/carte/DailySpecialBanner";
 import { DailyMenuBanner } from "@/components/carte/DailyMenuBanner";
 import { ButtonLink } from "@/components/ui/Button";
 import { ArrowUpRight } from "lucide-react";
+import { getT } from "@/lib/lang";
+
 
 export async function generateMetadata(): Promise<Metadata> {
   const restaurant = await requireCurrentRestaurant();
@@ -16,6 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function CartePage() {
   const restaurant = await requireCurrentRestaurant();
+  const t = await getT();
   const [{ categories, items }, dailyMenu, baseUrl] = await Promise.all([
     getMenu(restaurant.id),
     getActiveDailyMenu(restaurant.id),
@@ -35,7 +38,7 @@ export default async function CartePage() {
         <div className="mx-auto grid max-w-6xl items-end gap-8 md:grid-cols-[1fr_auto]">
           <div>
             <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-primary)]">
-              <span className="h-px w-8 bg-[var(--color-primary)]" />À découvrir
+              <span className="h-px w-8 bg-[var(--color-primary)]" />{t("À découvrir")}
             </p>
             <h1 className="mt-5 max-w-4xl font-[family-name:var(--font-title)] text-4xl font-normal leading-[1.05] tracking-[-0.035em] text-[var(--color-secondary)] sm:text-6xl">
               La carte de {restaurant.name}
@@ -44,7 +47,7 @@ export default async function CartePage() {
           </div>
           <div className="flex flex-col items-start gap-3 border-l border-black/10 pl-5 md:items-end md:border-l-0 md:pl-0">
             {restaurant.cuisine_type && <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-600">{restaurant.cuisine_type}</p>}
-            <ButtonLink href="/reservation" variant="outline" size="sm" icon={<ArrowUpRight className="h-3.5 w-3.5" />}>Réserver une table</ButtonLink>
+            <ButtonLink href="/reservation" variant="outline" size="sm" icon={<ArrowUpRight className="h-3.5 w-3.5" />}>{t("Réserver une table")}</ButtonLink>
           </div>
         </div>
       </section>

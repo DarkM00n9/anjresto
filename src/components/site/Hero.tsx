@@ -3,13 +3,17 @@ import type { Restaurant } from "@/types/database";
 import type { LayoutPreset } from "@/lib/layout-presets";
 import { ButtonLink } from "@/components/ui/Button";
 import { ArrowDown, MapPin } from "lucide-react";
+import { GoogleReviews } from "./GoogleReviews";
+import { getT } from "@/lib/lang";
+
 
 interface HeroProps {
   restaurant: Restaurant;
   preset: LayoutPreset;
 }
 
-export function Hero({ restaurant, preset }: HeroProps) {
+export async function Hero({ restaurant, preset }: HeroProps) {
+  const t = await getT();
   return (
     <section className="relative isolate flex min-h-[min(900px,calc(100svh-64px))] items-center justify-center overflow-hidden text-white">
       {restaurant.cover_image_url ? (
@@ -52,14 +56,17 @@ export function Hero({ restaurant, preset }: HeroProps) {
         {restaurant.tagline && (
           <p style={{ "--enter-delay": "700ms" } as React.CSSProperties} className="hero-enter max-w-2xl text-base leading-7 text-white/90 sm:text-lg sm:leading-8">{restaurant.tagline}</p>
         )}
+        <div style={{ "--enter-delay": "800ms" } as React.CSSProperties} className="hero-enter">
+          <GoogleReviews restaurant={restaurant} />
+        </div>
         <div style={{ "--enter-delay": "900ms" } as React.CSSProperties} className="hero-enter flex flex-wrap items-center justify-center gap-3 pt-2">
-          <ButtonLink href="/reservation" size="lg" className="min-w-48">Réserver une table</ButtonLink>
+          <ButtonLink href="/reservation" size="lg" className="min-w-48">{t("Réserver une table")}</ButtonLink>
           <ButtonLink href="/carte" variant="outline-white" size="lg">
-            Voir la carte
+            {t("Voir la carte")}
           </ButtonLink>
         </div>
         <a href="#histoire" style={{ "--enter-delay": "1200ms" } as React.CSSProperties} className="hero-enter mt-12 inline-flex flex-col items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/75 transition-colors hover:text-white">
-          Découvrir la maison <ArrowDown className="hero-bob h-4 w-4" />
+          {t("Découvrir la maison")} <ArrowDown className="hero-bob h-4 w-4" />
         </a>
       </div>
     </section>

@@ -16,10 +16,11 @@ import {
 } from "@/lib/schemas";
 import { z } from "zod";
 import { requireAdminContext } from "./guard";
+import { ALL_ROLES } from "@/lib/permissions";
 import type { Reservation, ReservationStatus } from "@/types/database";
 
 async function updateStatusAndNotify(reservationId: string, newStatus: ReservationStatus) {
-  const { restaurant } = await requireAdminContext();
+  const { restaurant } = await requireAdminContext(ALL_ROLES);
   const supabase = await createClient();
 
   const { data: reservation } = await supabase
@@ -50,7 +51,7 @@ async function updateStatusAndNotify(reservationId: string, newStatus: Reservati
 
 /** Annule d'un coup toutes les réservations d'un service et prévient chaque client par e-mail. */
 export async function cancelServiceReservations(date: string, opensAt: string, closesAt: string, message: string) {
-  const { restaurant } = await requireAdminContext();
+  const { restaurant } = await requireAdminContext(ALL_ROLES);
   const supabase = await createClient();
   const { data } = await supabase
     .from("reservations")
@@ -79,7 +80,7 @@ export async function cancelServiceReservations(date: string, opensAt: string, c
 }
 
 export async function dismissWaitlistEntry(id: string) {
-  const { restaurant } = await requireAdminContext();
+  const { restaurant } = await requireAdminContext(ALL_ROLES);
   const supabase = await createClient();
   await supabase.from("waitlist").update({ status: "done" }).eq("id", id).eq("restaurant_id", restaurant.id);
   revalidatePath("/admin/reservations");
@@ -106,7 +107,7 @@ export async function markNoShow(reservationId: string) {
 }
 
 export async function createManualReservation(input: ManualReservationInput) {
-  const { restaurant } = await requireAdminContext();
+  const { restaurant } = await requireAdminContext(ALL_ROLES);
   const data = manualReservationSchema.parse(input);
   const supabase = await createClient();
 
@@ -139,7 +140,7 @@ export async function updateReservationSettings(input: ReservationSettingsInput)
 }
 
 export async function toggleBlockedService(input: BlockedServiceInput, block: boolean) {
-  const { restaurant } = await requireAdminContext();
+  const { restaurant } = await requireAdminContext(ALL_ROLES);
   const data = closureSettingsSchema.parse(input);
   const supabase = await createClient();
 
@@ -169,7 +170,7 @@ export async function updateReservationDetails(
   reservationId: string,
   input: { time: string; party_size: number; notes?: string },
 ) {
-  const { restaurant } = await requireAdminContext();
+  const { restaurant } = await requireAdminContext(ALL_ROLES);
   const data = updateReservationSchema.parse(input);
   const supabase = await createClient();
 

@@ -11,6 +11,7 @@ import { getBookableDateRange, type AvailableSlot } from "@/lib/reservations/ava
 import { TimeSlotPicker } from "./TimeSlotPicker";
 import { WaitlistForm } from "./WaitlistForm";
 import { buildCalendarLinks } from "@/lib/calendar";
+import { useT } from "@/components/site/LangProvider";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -24,6 +25,7 @@ interface ReservationFormProps {
 }
 
 export function ReservationForm({ restaurantId, settings, restaurantPhone, restaurantName, restaurantAddress }: ReservationFormProps) {
+  const t = useT();
   const { min, max } = getBookableDateRange(settings);
   const [slotResponse, setSlotResponse] = useState<{ key: string; slots: AvailableSlot[] } | null>(null);
   const [honeypot, setHoneypot] = useState("");
@@ -102,16 +104,16 @@ export function ReservationForm({ restaurantId, settings, restaurantPhone, resta
           <CheckCircle2 className="h-6 w-6" />
         </span>
         <p className="mt-4 text-xl font-semibold text-emerald-900">
-          {result.status === "confirmed" ? "Réservation confirmée !" : "Demande envoyée !"}
+          {result.status === "confirmed" ? t("Réservation confirmée !") : t("Demande envoyée !")}
         </p>
         <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-emerald-800">
           {result.status === "confirmed"
-            ? "Votre table est réservée. Vous recevrez un email de confirmation."
-            : "Le restaurant va confirmer votre demande rapidement. Vous recevrez un email."}
+            ? t("Votre table est réservée. Vous recevrez un email de confirmation.")
+            : t("Le restaurant va confirmer votre demande rapidement. Vous recevrez un email.")}
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-2">
           <a href={calendar.google} target="_blank" rel="noopener noreferrer" className="rounded-full border border-emerald-700 bg-white px-4 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-100">
-            Google Agenda
+            {t("Google Agenda")}
           </a>
           <a href={calendar.icsHref} download="reservation.ics" className="rounded-full border border-emerald-700 bg-white px-4 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-100">
             Apple / Outlook (.ics)
@@ -136,17 +138,17 @@ export function ReservationForm({ restaurantId, settings, restaurantPhone, resta
 
       <section>
         <div className="mb-4 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500">
-          <CalendarDays className="h-4 w-4 text-[var(--color-primary)]" /> Date et nombre de convives
+          <CalendarDays className="h-4 w-4 text-[var(--color-primary)]" /> {t("Date et nombre de convives")}
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Input id="reservation-date" label="Date" type="date" min={min} max={max} {...register("date")} />
-          <Input id="reservation-party-size" label="Nombre de personnes" type="number" min={1} max={50} {...register("party_size")} />
+          <Input id="reservation-date" label={t("Date")} type="date" min={min} max={max} {...register("date")} />
+          <Input id="reservation-party-size" label={t("Nombre de personnes")} type="number" min={1} max={50} {...register("party_size")} />
         </div>
       </section>
 
       <section className="border-t border-stone-200 pt-5">
         <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500">
-          <Clock3 className="h-4 w-4 text-[var(--color-primary)]" /> Choisissez votre horaire
+          <Clock3 className="h-4 w-4 text-[var(--color-primary)]" /> {t("Choisissez votre horaire")}
         </div>
         {partyTooLarge ? (
           <p className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
@@ -154,34 +156,34 @@ export function ReservationForm({ restaurantId, settings, restaurantPhone, resta
             {restaurantPhone ? ` au ${restaurantPhone}` : ""}.
           </p>
         ) : loadingSlots ? (
-          <p className="flex items-center gap-2 py-2 text-sm text-stone-500"><LoaderCircle className="h-4 w-4 animate-spin" />Recherche des créneaux disponibles…</p>
+          <p className="flex items-center gap-2 py-2 text-sm text-stone-500"><LoaderCircle className="h-4 w-4 animate-spin" />{t("Recherche des créneaux disponibles…")}</p>
         ) : slots.length === 0 ? (
           <>
-            <p className="rounded-xl bg-stone-200 px-4 py-3 text-sm text-stone-700">Aucun créneau disponible ce jour-là. Essayez une autre date.</p>
+            <p className="rounded-xl bg-stone-200 px-4 py-3 text-sm text-stone-700">{t("Aucun créneau disponible ce jour-là. Essayez une autre date.")}</p>
             <WaitlistForm restaurantId={restaurantId} date={date} partySize={partySize} />
           </>
         ) : (
           <TimeSlotPicker slots={slots} value={time} onChange={(t) => setValue("time", t)} />
         )}
-        {errors.time && <p role="alert" className="mt-2 text-xs font-medium text-red-600">Choisissez un horaire.</p>}
+        {errors.time && <p role="alert" className="mt-2 text-xs font-medium text-red-600">{t("Choisissez un horaire.")}</p>}
       </section>
 
       <section className="space-y-4 border-t border-stone-200 pt-5">
         <div className="mb-1 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500">
-          <Users className="h-4 w-4 text-[var(--color-primary)]" /> Vos coordonnées
+          <Users className="h-4 w-4 text-[var(--color-primary)]" /> {t("Vos coordonnées")}
         </div>
-        <Input id="reservation-name" label="Nom complet" autoComplete="name" {...register("customer_name")} error={errors.customer_name?.message} />
+        <Input id="reservation-name" label={t("Nom complet")} autoComplete="name" {...register("customer_name")} error={errors.customer_name?.message} />
         <div className="grid gap-4 sm:grid-cols-2">
-          <Input id="reservation-phone" label="Téléphone" type="tel" autoComplete="tel" {...register("customer_phone")} error={errors.customer_phone?.message} />
-          <Input id="reservation-email" label="E-mail (facultatif)" type="email" autoComplete="email" {...register("customer_email")} error={errors.customer_email?.message} />
+          <Input id="reservation-phone" label={t("Téléphone")} type="tel" autoComplete="tel" {...register("customer_phone")} error={errors.customer_phone?.message} />
+          <Input id="reservation-email" label={t("E-mail (facultatif)")} type="email" autoComplete="email" {...register("customer_email")} error={errors.customer_email?.message} />
         </div>
-        <Textarea id="reservation-notes" label="Message (facultatif)" rows={3} {...register("notes")} placeholder="Allergies, occasion particulière…" />
+        <Textarea id="reservation-notes" label={t("Message (facultatif)")} rows={3} {...register("notes")} placeholder={t("Allergies, occasion particulière…")} />
       </section>
 
       <div className="border-t border-stone-200 pt-5">
         <label className="flex cursor-pointer items-start gap-3 text-sm leading-5 text-stone-600">
           <input type="checkbox" {...register("consent")} className="mt-0.5 h-4 w-4 rounded border-stone-300 accent-[var(--color-primary)]" />
-          <span>J’accepte que mes données soient utilisées pour traiter ma réservation.</span>
+          <span>{t("J’accepte que mes données soient utilisées pour traiter ma réservation.")}</span>
         </label>
         {errors.consent && <p role="alert" className="mt-2 text-xs font-medium text-red-600">{errors.consent.message}</p>}
       </div>
@@ -189,9 +191,9 @@ export function ReservationForm({ restaurantId, settings, restaurantPhone, resta
       {serverError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{serverError}</p>}
 
       <Button type="submit" variant="primary" size="lg" loading={isPending} disabled={isPending || partyTooLarge || !time} className="w-full">
-        Envoyer ma demande
+        {t("Envoyer ma demande")}
       </Button>
-      <p className="text-center text-xs text-stone-600">Aucun paiement ne sera demandé en ligne.</p>
+      <p className="text-center text-xs text-stone-600">{t("Aucun paiement ne sera demandé en ligne.")}</p>
     </form>
   );
 }
