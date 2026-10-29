@@ -50,6 +50,7 @@ const EN: Record<string, string> = {
   Samedi: "Saturday",
   Dimanche: "Sunday",
   // Carte
+  "La carte de": "The menu at",
   "À découvrir": "To discover",
   "À la carte": "À la carte",
   "Menu du jour": "Today's menu",
@@ -116,6 +117,13 @@ const EN: Record<string, string> = {
   "Apple / Outlook (.ics)": "Apple / Outlook (.ics)",
   "Google Agenda": "Google Calendar",
 };
+
+/** Contenu saisi par le restaurant : version anglaise si disponible, sinon le français. */
+export function localized(lang: Lang, fr: string, en?: string | null): string;
+export function localized(lang: Lang, fr: string | null | undefined, en?: string | null): string | null;
+export function localized(lang: Lang, fr: string | null | undefined, en?: string | null) {
+  return lang === "en" && en ? en : (fr ?? null);
+}
 
 export function translate(lang: Lang, text: string): string {
   return lang === "en" ? (EN[text] ?? text) : text;

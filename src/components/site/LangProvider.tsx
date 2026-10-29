@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import { translate, type Lang } from "@/lib/i18n";
+import { localized, translate, type Lang } from "@/lib/i18n";
 
 const LangContext = createContext<Lang>("fr");
 
@@ -13,6 +13,11 @@ export function LangProvider({ lang, children }: { lang: Lang; children: ReactNo
 export function useT() {
   const lang = useContext(LangContext);
   return (text: string) => translate(lang, text);
+}
+
+export function useLocalize() {
+  const lang = useContext(LangContext);
+  return (fr: string | null | undefined, en?: string | null) => localized(lang, fr, en);
 }
 
 export function useLang() {

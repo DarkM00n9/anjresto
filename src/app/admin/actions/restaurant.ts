@@ -4,12 +4,14 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { restaurantInfoSchema, type RestaurantInfoInput } from "@/lib/schemas";
 import { requireAdminContext } from "./guard";
+import { translateToEnglish } from "@/lib/translate";
 import { OWNER_ONLY } from "@/lib/permissions";
 
 export async function updateRestaurantInfo(input: RestaurantInfoInput) {
   const { restaurant } = await requireAdminContext(OWNER_ONLY);
   const data = restaurantInfoSchema.parse(input);
   const supabase = await createClient();
+  const en = await translateToEnglish({ tagline: data.tagline, description: data.description });
 
   await supabase
     .from("restaurants")
@@ -17,6 +19,8 @@ export async function updateRestaurantInfo(input: RestaurantInfoInput) {
       name: data.name,
       tagline: data.tagline || null,
       description: data.description || null,
+      tagline_en: en.tagline ?? null,
+      description_en: en.description ?? null,
       phone: data.phone || null,
       email: data.email || null,
       address_line: data.address_line || null,

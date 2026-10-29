@@ -8,7 +8,7 @@ import { DailySpecialBanner } from "@/components/carte/DailySpecialBanner";
 import { DailyMenuBanner } from "@/components/carte/DailyMenuBanner";
 import { ButtonLink } from "@/components/ui/Button";
 import { ArrowUpRight } from "lucide-react";
-import { getT } from "@/lib/lang";
+import { getT, getLocalize } from "@/lib/lang";
 
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function CartePage() {
   const restaurant = await requireCurrentRestaurant();
   const t = await getT();
+  const L = await getLocalize();
   const [{ categories, items }, dailyMenu, baseUrl] = await Promise.all([
     getMenu(restaurant.id),
     getActiveDailyMenu(restaurant.id),
@@ -41,9 +42,9 @@ export default async function CartePage() {
               <span className="h-px w-8 bg-[var(--color-primary)]" />{t("À découvrir")}
             </p>
             <h1 className="mt-5 max-w-4xl font-[family-name:var(--font-title)] text-4xl font-normal leading-[1.05] tracking-[-0.035em] text-[var(--color-secondary)] sm:text-6xl">
-              La carte de {restaurant.name}
+              {t("La carte de")} {restaurant.name}
             </h1>
-            {restaurant.tagline && <p className="mt-4 max-w-xl text-base leading-7 text-stone-700">{restaurant.tagline}</p>}
+            {restaurant.tagline && <p className="mt-4 max-w-xl text-base leading-7 text-stone-700">{L(restaurant.tagline, restaurant.tagline_en)}</p>}
           </div>
           <div className="flex flex-col items-start gap-3 border-l border-black/10 pl-5 md:items-end md:border-l-0 md:pl-0">
             {restaurant.cuisine_type && <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-600">{restaurant.cuisine_type}</p>}

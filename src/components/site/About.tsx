@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { Restaurant } from "@/types/database";
 import { Section } from "@/components/ui/Section";
 import type { LayoutPreset } from "@/lib/layout-presets";
-import { getT } from "@/lib/lang";
+import { getT, getLocalize } from "@/lib/lang";
 
 
 interface AboutProps {
@@ -12,6 +12,7 @@ interface AboutProps {
 
 export async function About({ restaurant, preset }: AboutProps) {
   const t = await getT();
+  const L = await getLocalize();
   if (!restaurant.description && restaurant.gallery_urls.length === 0) return null;
   const imageKey = (url: string) => {
     try {
@@ -36,7 +37,7 @@ export async function About({ restaurant, preset }: AboutProps) {
             {t("L’esprit de la maison")}
           </h2>
           {restaurant.description && (
-            <p className="mt-7 max-w-xl whitespace-pre-line border-l border-[var(--color-primary)]/50 pl-5 text-base leading-8 text-stone-700 sm:text-lg sm:leading-8">{restaurant.description}</p>
+            <p className="mt-7 max-w-xl whitespace-pre-line border-l border-[var(--color-primary)]/50 pl-5 text-base leading-8 text-stone-700 sm:text-lg sm:leading-8">{L(restaurant.description, restaurant.description_en)}</p>
           )}
           {(restaurant.cuisine_type || restaurant.city) && (
             <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-600">

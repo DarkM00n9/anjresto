@@ -162,3 +162,7 @@ Migration à exécuter dans Supabase (SQL Editor) : `0012_reservation_capacity.s
 - Migration `0014_team_roles.sql` à exécuter : ajoute les rôles `manager` (gérant) et `staff` (employé).
 - `/admin/equipe` (propriétaire uniquement) : inviter par e-mail, changer le rôle, retirer l'accès. Le gérant n'a pas accès à Infos ni Équipe ; l'employé ne voit que les réservations.
 - Site public bilingue FR/EN : sélecteur dans l'en-tête (cookie `lang`). Dictionnaire dans `src/lib/i18n.ts` (le français sert de clé ; une chaîne absente reste en français). Les contenus saisis par le restaurant (plats, descriptions) restent dans leur langue d'origine.
+
+### Traduction automatique du contenu
+
+Migration `0015_english_content.sql`. Avec `ANTHROPIC_API_KEY` dans l'environnement, les textes saisis (carte, présentation, menu du jour) sont traduits en anglais à chaque enregistrement ; le bouton « Traduire tout mon site en anglais » (Admin > Infos) traduit l'existant. Sans clé, le site reste en français pour ces contenus.

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Printer } from "lucide-react";
 import type { Category, MenuItem } from "@/types/database";
 import { MenuItemCard } from "./MenuItemCard";
-import { useT } from "@/components/site/LangProvider";
+import { useT, useLocalize } from "@/components/site/LangProvider";
 
 const FILTERS = [
   { key: "is_vegetarian", label: "Végétarien" },
@@ -17,6 +17,7 @@ type FilterKey = (typeof FILTERS)[number]["key"];
 /** Liste de la carte avec filtres alimentaires (côté client) et export PDF via l'impression du navigateur. */
 export function CarteList({ categories, items }: { categories: Category[]; items: MenuItem[] }) {
   const t = useT();
+  const L = useLocalize();
   const [active, setActive] = useState<FilterKey[]>([]);
 
   const visible = items.filter((item) => active.every((key) => item[key]));
@@ -60,10 +61,10 @@ export function CarteList({ categories, items }: { categories: Category[]; items
               <div>
                 <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]">{t("À la carte")}</p>
                 <h2 className="font-[family-name:var(--font-title)] text-3xl font-normal tracking-tight text-[var(--color-secondary)] sm:text-4xl">
-                  {category.name}
+                  {L(category.name, category.name_en)}
                 </h2>
               </div>
-              {category.description && <p className="max-w-sm text-sm leading-6 text-stone-600 sm:text-right">{category.description}</p>}
+              {category.description && <p className="max-w-sm text-sm leading-6 text-stone-600 sm:text-right">{L(category.description, category.description_en)}</p>}
             </div>
             <ul className="mt-5 divide-y divide-black/[0.07] border-t border-black/[0.07]">
               {list.map((item) => (

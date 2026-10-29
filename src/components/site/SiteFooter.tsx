@@ -2,11 +2,12 @@ import Link from "next/link";
 import type { Restaurant } from "@/types/database";
 import { ArrowUpRight, MapPin, Phone } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
-import { getT } from "@/lib/lang";
+import { getT, getLocalize } from "@/lib/lang";
 
 
 export async function SiteFooter({ restaurant }: { restaurant: Restaurant }) {
   const t = await getT();
+  const L = await getLocalize();
   const address = [restaurant.address_line, restaurant.postal_code, restaurant.city]
     .filter(Boolean)
     .join(", ");
@@ -17,7 +18,7 @@ export async function SiteFooter({ restaurant }: { restaurant: Restaurant }) {
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">{t("La maison")}</p>
           <Link href="/" className="mt-3 inline-block font-[family-name:var(--font-title)] text-3xl font-normal tracking-tight sm:text-4xl">{restaurant.name}</Link>
-          {restaurant.tagline && <p className="mt-4 max-w-sm text-sm leading-6 text-white/80">{restaurant.tagline}</p>}
+          {restaurant.tagline && <p className="mt-4 max-w-sm text-sm leading-6 text-white/80">{L(restaurant.tagline, restaurant.tagline_en)}</p>}
         </div>
 
         <div className="space-y-4 text-sm text-white/80">

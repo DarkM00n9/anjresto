@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Category } from "@/types/database";
-import { useT } from "@/components/site/LangProvider";
+import { useT, useLocalize } from "@/components/site/LangProvider";
 
 interface CategoryTabsProps {
   categories: Category[];
@@ -10,6 +10,7 @@ interface CategoryTabsProps {
 
 export function CategoryTabs({ categories }: CategoryTabsProps) {
   const t = useT();
+  const L = useLocalize();
   const [activeId, setActiveId] = useState(categories[0]?.id);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -51,7 +52,7 @@ export function CategoryTabs({ categories }: CategoryTabsProps) {
                   : "text-stone-600 after:scale-x-0 after:bg-[var(--color-primary)] hover:text-[var(--color-primary)] hover:after:scale-x-100"
               }`}
             >
-              {category.name}
+              {L(category.name, category.name_en)}
             </button>
           </li>
         ))}

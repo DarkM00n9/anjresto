@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { dailyMenuSchema, type DailyMenuInput } from "@/lib/schemas";
 import { requireAdminContext } from "./guard";
+import { translateToEnglish } from "@/lib/translate";
 
 /** Un seul menu du jour par restaurant et par date : upsert sur (restaurant_id, valid_date). */
 export async function upsertDailyMenu(input: DailyMenuInput) {
@@ -18,7 +19,12 @@ export async function upsertDailyMenu(input: DailyMenuInput) {
     .eq("valid_date", data.valid_date)
     .maybeSingle();
 
+  const en = await translateToEnglish({ title: data.title, starter: data.starter, main: data.main, dessert: data.dessert });
   const payload = {
+    title_en: en.title ?? null,
+    starter_en: en.starter ?? null,
+    main_en: en.main ?? null,
+    dessert_en: en.dessert ?? null,
     title: data.title,
     starter: data.starter || null,
     main: data.main || null,

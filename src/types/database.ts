@@ -51,6 +51,8 @@ export interface Restaurant {
   name: string;
   tagline: string | null;
   description: string | null;
+  tagline_en?: string | null;
+  description_en?: string | null;
   cuisine_type: string | null;
   logo_url: string | null;
   cover_image_url: string | null;
@@ -103,6 +105,8 @@ export interface Category {
   restaurant_id: string;
   name: string;
   description: string | null;
+  name_en?: string | null;
+  description_en?: string | null;
   display_order: number;
   created_at: string;
 }
@@ -113,6 +117,8 @@ export interface MenuItem {
   category_id: string;
   name: string;
   description: string | null;
+  name_en?: string | null;
+  description_en?: string | null;
   price: number;
   photo_url: string | null;
   is_available: boolean;
@@ -168,6 +174,10 @@ export interface DailyMenu {
   starter: string | null;
   main: string | null;
   dessert: string | null;
+  title_en?: string | null;
+  starter_en?: string | null;
+  main_en?: string | null;
+  dessert_en?: string | null;
   price: number;
   valid_date: string; // "YYYY-MM-DD"
   is_active: boolean;

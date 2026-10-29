@@ -4,11 +4,13 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { menuItemSchema, type MenuItemInput } from "@/lib/schemas";
 import { requireAdminContext } from "./guard";
+import { translateToEnglish } from "@/lib/translate";
 
 export async function createMenuItem(input: MenuItemInput) {
   const { restaurant } = await requireAdminContext();
   const data = menuItemSchema.parse(input);
   const supabase = await createClient();
+  const en = await translateToEnglish({ name: data.name, description: data.description });
 
   const { count } = await supabase
     .from("menu_items")
@@ -21,6 +23,8 @@ export async function createMenuItem(input: MenuItemInput) {
     category_id: data.category_id,
     name: data.name,
     description: data.description || null,
+    name_en: en.name ?? null,
+    description_en: en.description ?? null,
     price: data.price,
     photo_url: data.photo_url || null,
     is_vegetarian: data.is_vegetarian,
@@ -41,6 +45,7 @@ export async function updateMenuItem(itemId: string, input: MenuItemInput) {
   const { restaurant } = await requireAdminContext();
   const data = menuItemSchema.parse(input);
   const supabase = await createClient();
+  const en = await translateToEnglish({ name: data.name, description: data.description });
 
   await supabase
     .from("menu_items")
@@ -48,6 +53,8 @@ export async function updateMenuItem(itemId: string, input: MenuItemInput) {
       category_id: data.category_id,
       name: data.name,
       description: data.description || null,
+      name_en: en.name ?? null,
+      description_en: en.description ?? null,
       price: data.price,
       photo_url: data.photo_url || null,
       is_vegetarian: data.is_vegetarian,

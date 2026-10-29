@@ -4,11 +4,13 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { categorySchema, type CategoryInput } from "@/lib/schemas";
 import { requireAdminContext } from "./guard";
+import { translateToEnglish } from "@/lib/translate";
 
 export async function createCategory(input: CategoryInput) {
   const { restaurant } = await requireAdminContext();
   const data = categorySchema.parse(input);
   const supabase = await createClient();
+  const en = await translateToEnglish({ name: data.name, description: data.description });
 
   const { count } = await supabase
     .from("categories")
@@ -19,6 +21,8 @@ export async function createCategory(input: CategoryInput) {
     restaurant_id: restaurant.id,
     name: data.name,
     description: data.description || null,
+    name_en: en.name ?? null,
+    description_en: en.description ?? null,
     display_order: count ?? 0,
   });
 
@@ -30,10 +34,11 @@ export async function updateCategory(categoryId: string, input: CategoryInput) {
   const { restaurant } = await requireAdminContext();
   const data = categorySchema.parse(input);
   const supabase = await createClient();
+  const en = await translateToEnglish({ name: data.name, description: data.description });
 
   await supabase
     .from("categories")
-    .update({ name: data.name, description: data.description || null })
+    .update({ name: data.name, description: data.description || null, name_en: en.name ?? null, description_en: en.description ?? null })
     .eq("id", categoryId)
     .eq("restaurant_id", restaurant.id);
 

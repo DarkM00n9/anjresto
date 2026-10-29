@@ -1,10 +1,11 @@
 import type { MenuItem } from "@/types/database";
 import { Sparkles } from "lucide-react";
-import { getT } from "@/lib/lang";
+import { getT, getLocalize } from "@/lib/lang";
 
 
 export async function DailySpecialBanner({ items }: { items: MenuItem[] }) {
   const t = await getT();
+  const L = await getLocalize();
   const specials = items.filter((item) => item.is_daily_special && item.is_available);
   if (specials.length === 0) return null;
 
@@ -15,7 +16,7 @@ export async function DailySpecialBanner({ items }: { items: MenuItem[] }) {
       <ul className="mt-3 divide-y divide-black/[0.07]">
         {specials.map((item) => (
           <li key={item.id} className="flex items-baseline justify-between gap-4 py-3 text-sm first:pt-2 last:pb-0">
-            <span className="font-[family-name:var(--font-title)] text-base font-medium text-[var(--color-secondary)] sm:text-lg">{item.name}</span>
+            <span className="font-[family-name:var(--font-title)] text-base font-medium text-[var(--color-secondary)] sm:text-lg">{L(item.name, item.name_en)}</span>
             <span className="whitespace-nowrap text-sm font-semibold tabular-nums text-[var(--color-primary)]">{item.price.toFixed(2)} €</span>
           </li>
         ))}

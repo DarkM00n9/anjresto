@@ -2,7 +2,7 @@ import type { Category, MenuItem } from "@/types/database";
 import { Section } from "@/components/ui/Section";
 import { ButtonLink } from "@/components/ui/Button";
 import { ArrowUpRight } from "lucide-react";
-import { getT } from "@/lib/lang";
+import { getT, getLocalize } from "@/lib/lang";
 
 
 interface MenuPreviewProps {
@@ -12,9 +12,10 @@ interface MenuPreviewProps {
 
 export async function MenuPreview({ categories, items }: MenuPreviewProps) {
   const t = await getT();
+  const L = await getLocalize();
   if (categories.length === 0 && items.length === 0) return null;
 
-  const categoryNames = new Map(categories.map((category) => [category.id, category.name]));
+  const categoryNames = new Map(categories.map((category) => [category.id, L(category.name, category.name_en)]));
   const previewItems = [...items]
     .filter((item) => item.is_available)
     .sort(
@@ -42,7 +43,7 @@ export async function MenuPreview({ categories, items }: MenuPreviewProps) {
           {categories.length > 0 && (
             <ul className="mt-9 grid grid-cols-2 gap-x-7 gap-y-3 border-t border-black/10 pt-5 text-xs font-medium uppercase tracking-[0.12em] text-stone-600 sm:grid-cols-3 lg:grid-cols-2">
               {categories.map((category) => (
-                <li key={category.id}>{category.name}</li>
+                <li key={category.id}>{L(category.name, category.name_en)}</li>
               ))}
             </ul>
           )}
@@ -68,10 +69,10 @@ export async function MenuPreview({ categories, items }: MenuPreviewProps) {
                     </p>
                   )}
                   <h3 className="font-[family-name:var(--font-title)] text-lg font-medium leading-snug text-[var(--color-secondary)] sm:text-xl">
-                    {item.name}
+                    {L(item.name, item.name_en)}
                   </h3>
                   {item.description && (
-                    <p className="mt-1.5 max-w-lg text-sm leading-6 text-stone-600">{item.description}</p>
+                    <p className="mt-1.5 max-w-lg text-sm leading-6 text-stone-600">{L(item.description, item.description_en)}</p>
                   )}
                 </div>
                 <span className="pt-1 text-sm font-semibold tabular-nums text-[var(--color-primary)] sm:text-base">
@@ -85,8 +86,8 @@ export async function MenuPreview({ categories, items }: MenuPreviewProps) {
             {categories.map((category, index) => (
               <article key={category.id} className="border-b border-black/10 py-6 sm:px-5 sm:first:pl-0">
                 <p className="font-[family-name:var(--font-title)] text-base italic text-[var(--color-primary)]/70">{String(index + 1).padStart(2, "0")}</p>
-                <h3 className="mt-2 font-[family-name:var(--font-title)] text-xl font-medium text-[var(--color-secondary)]">{category.name}</h3>
-                {category.description && <p className="mt-1 text-sm leading-6 text-stone-600">{category.description}</p>}
+                <h3 className="mt-2 font-[family-name:var(--font-title)] text-xl font-medium text-[var(--color-secondary)]">{L(category.name, category.name_en)}</h3>
+                {category.description && <p className="mt-1 text-sm leading-6 text-stone-600">{L(category.description, category.description_en)}</p>}
               </article>
             ))}
           </div>

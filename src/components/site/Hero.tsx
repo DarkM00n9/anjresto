@@ -4,7 +4,7 @@ import type { LayoutPreset } from "@/lib/layout-presets";
 import { ButtonLink } from "@/components/ui/Button";
 import { ArrowDown, MapPin } from "lucide-react";
 import { GoogleReviews } from "./GoogleReviews";
-import { getT } from "@/lib/lang";
+import { getT, getLocalize } from "@/lib/lang";
 
 
 interface HeroProps {
@@ -14,6 +14,7 @@ interface HeroProps {
 
 export async function Hero({ restaurant, preset }: HeroProps) {
   const t = await getT();
+  const L = await getLocalize();
   return (
     <section className="relative isolate flex min-h-[min(900px,calc(100svh-64px))] items-center justify-center overflow-hidden text-white">
       {restaurant.cover_image_url ? (
@@ -54,7 +55,7 @@ export async function Hero({ restaurant, preset }: HeroProps) {
           {restaurant.name}
         </h1>
         {restaurant.tagline && (
-          <p style={{ "--enter-delay": "700ms" } as React.CSSProperties} className="hero-enter max-w-2xl text-base leading-7 text-white/90 sm:text-lg sm:leading-8">{restaurant.tagline}</p>
+          <p style={{ "--enter-delay": "700ms" } as React.CSSProperties} className="hero-enter max-w-2xl text-base leading-7 text-white/90 sm:text-lg sm:leading-8">{L(restaurant.tagline, restaurant.tagline_en)}</p>
         )}
         <div style={{ "--enter-delay": "800ms" } as React.CSSProperties} className="hero-enter">
           <GoogleReviews restaurant={restaurant} />
