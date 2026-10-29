@@ -132,6 +132,35 @@ const EN: Record<string, string> = {
   "Vous êtes sur liste d'attente. Nous vous préviendrons si une table se libère.": "You are on the waitlist. We will let you know if a table becomes available.",
   "Apple / Outlook (.ics)": "Apple / Outlook (.ics)",
   "Google Agenda": "Google Calendar",
+  // Pages légales et annulation
+  Informations: "Information",
+  "Vos données": "Your data",
+  "Le présent site est édité par": "This website is published by",
+  "Représentant légal :": "Legal representative:",
+  "Siège :": "Registered office:",
+  "Contact :": "Contact:",
+  "Hébergement :": "Hosting:",
+  "Conception du site :": "Website design:",
+  "Politique de confidentialité": "Privacy policy",
+  "collecte uniquement les informations nécessaires au traitement de vos demandes de réservation (nom, téléphone, email le cas échéant, date et nombre de couverts).":
+    "only collects the information needed to process your booking requests (name, phone, email where applicable, date and party size).",
+  "Ces données sont conservées le temps nécessaire au traitement de votre réservation et ne sont jamais transmises à des tiers à des fins commerciales.":
+    "This data is kept for as long as needed to process your booking and is never passed to third parties for commercial purposes.",
+  "Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification et de suppression de vos données en nous contactant":
+    "In accordance with the General Data Protection Regulation (GDPR), you have the right to access, correct and delete your data by contacting us",
+  "à": "at",
+  directement: "directly",
+  "Ce site n'utilise pas de cookies de suivi publicitaire.": "This website does not use advertising tracking cookies.",
+  "Votre réservation": "Your booking",
+  "Annuler ma réservation": "Cancel my booking",
+  "Vérifiez les détails avant de confirmer l’annulation.": "Please check the details before confirming the cancellation.",
+  "Confirmer l’annulation": "Confirm cancellation",
+  "Annulation…": "Cancelling…",
+  "Réservation annulée.": "Booking cancelled.",
+  "Nous espérons vous accueillir une prochaine fois.": "We hope to welcome you another time.",
+  "Une erreur est survenue.": "Something went wrong.",
+  Heure: "Time",
+  Couverts: "Guests",
 };
 
 /** Contenu saisi par le restaurant : version anglaise si disponible, sinon le français. */
