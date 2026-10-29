@@ -59,7 +59,7 @@ export default async function CartePage() {
           </div>
         </div>
       </section>
-      <CategoryTabs categories={sortedCategories} modern={modern} />
+      <CategoryTabs categories={sortedCategories} />
       <DailyMenuBanner dailyMenu={dailyMenu} />
       <DailySpecialBanner items={items} />
       <CarteList categories={sortedCategories} items={items} />
