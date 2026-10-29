@@ -3,7 +3,7 @@ import { getCurrentRestaurant, getBaseUrl } from "@/lib/get-current-restaurant";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const restaurant = await getCurrentRestaurant();
-  if (!restaurant) return [];
+  if (!restaurant || restaurant.status === "suspended") return [];
 
   const baseUrl = await getBaseUrl();
   const now = new Date();

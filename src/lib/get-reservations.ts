@@ -45,7 +45,7 @@ export const getReservationSettings = cache(
       .eq("restaurant_id", restaurantId)
       .maybeSingle();
 
-    return (data as ReservationSettings | null) ?? defaultReservationSettings(restaurantId);
+    return { ...defaultReservationSettings(restaurantId), ...((data as Partial<ReservationSettings> | null) ?? {}) };
   },
 );
 
@@ -59,3 +59,31 @@ export const getBlockedServices = cache(
     return (data ?? []) as BlockedService[];
   },
 );
+
+export const listReservationsInRange = cache(
+  async (restaurantId: string, from: string, to: string): Promise<Reservation[]> => {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("reservations")
+      .select("*")
+      .eq("restaurant_id", restaurantId)
+      .gte("reservation_date", from)
+      .lte("reservation_date", to)
+      .order("reservation_date", { ascending: true })
+      .order("reservation_time", { ascending: true });
+
+    return (data ?? []) as Reservation[];
+  },
+);
+
+export const countPendingReservations = cache(async (restaurantId: string): Promise<number> => {
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("reservations")
+    .select("id", { count: "exact", head: true })
+    .eq("restaurant_id", restaurantId)
+    .eq("status", "pending")
+    .gte("reservation_date", todayInParis());
+
+  return count ?? 0;
+});

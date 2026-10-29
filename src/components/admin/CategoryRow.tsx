@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { GripVertical, Trash2 } from "lucide-react";
+import { IconButton } from "@/components/ui/IconButton";
 import type { Category } from "@/types/database";
 import { updateCategory, deleteCategory } from "@/app/admin/actions/categories";
 
@@ -40,15 +42,15 @@ export function CategoryRow({ category, onDeleted }: { category: Category; onDel
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center gap-2">
+    <div ref={setNodeRef} style={style} className="flex items-center gap-2 border-b border-slate-200 pb-3">
       <button
         type="button"
         {...attributes}
         {...listeners}
-        className="touch-none px-1 text-lg text-neutral-400"
-        aria-label="Réordonner la catégorie"
+        className="flex h-11 w-11 shrink-0 touch-none items-center justify-center rounded-xl text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-700"
+        aria-label={`Réordonner la catégorie ${category.name}`}
       >
-        ⠿
+        <GripVertical className="h-5 w-5" />
       </button>
 
       {editing ? (
@@ -57,27 +59,28 @@ export function CategoryRow({ category, onDeleted }: { category: Category; onDel
           onChange={(e) => setName(e.target.value)}
           onBlur={handleSave}
           autoFocus
-          className="flex-1 rounded-lg border border-neutral-300 px-2 py-1 text-base font-semibold"
+          className="min-h-10 flex-1 rounded-lg border border-indigo-200 bg-indigo-50/50 px-3 py-2 text-base font-semibold text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/10"
         />
       ) : (
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="flex-1 text-left text-base font-semibold text-neutral-900"
+          className="flex-1 rounded-lg px-2 py-2 text-left text-base font-semibold text-slate-900 transition-colors hover:bg-slate-100"
         >
           {category.name}
         </button>
       )}
 
-      <button
+      <IconButton
         type="button"
         onClick={handleDelete}
         disabled={isPending}
-        className="px-2 text-sm text-red-500"
-        aria-label="Supprimer la catégorie"
+        tone="danger"
+        className="h-11 w-11 sm:h-9 sm:w-9"
+        aria-label={`Supprimer la catégorie ${category.name}`}
       >
-        ✕
-      </button>
+        <Trash2 className="h-4 w-4" />
+      </IconButton>
     </div>
   );
 }

@@ -20,11 +20,11 @@ export default async function CancellationPage({ params }: { params: Promise<{ t
   if (!reservation) notFound();
 
   return (
-    <Section spacing="py-16">
-      <div className="mx-auto max-w-sm">
-        <h1 className="font-[family-name:var(--font-title)] text-2xl font-bold text-[var(--color-secondary)]">
-          Annuler ma réservation
-        </h1>
+    <Section spacing="py-12 md:py-20" className="bg-stone-200/70">
+      <div className="mx-auto max-w-xl">
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--color-primary)]">Votre réservation</p>
+        <h1 className="mt-2 font-[family-name:var(--font-title)] text-3xl font-bold text-[var(--color-secondary)] sm:text-4xl">Annuler ma réservation</h1>
+        <p className="mt-2 text-sm text-stone-700">Vérifiez les détails avant de confirmer l’annulation.</p>
         <div className="mt-6">
           <CancellationCard reservation={reservation as Reservation} />
         </div>

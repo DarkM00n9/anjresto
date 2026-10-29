@@ -15,7 +15,7 @@ export default async function ConfidentialitePage() {
       <h1 className="font-[family-name:var(--font-title)] text-3xl font-bold text-[var(--color-secondary)]">
         Politique de confidentialité
       </h1>
-      <div className="mt-6 space-y-4 text-sm text-black/70">
+      <div className="mt-6 space-y-4 text-sm text-stone-700">
         <p>
           {restaurant.name} collecte uniquement les informations nécessaires au traitement de vos
           demandes de réservation (nom, téléphone, email le cas échéant, date et nombre de couverts).

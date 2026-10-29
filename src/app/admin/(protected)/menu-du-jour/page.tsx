@@ -1,17 +1,16 @@
 import { requireCurrentRestaurant } from "@/lib/get-current-restaurant";
 import { getActiveDailyMenu } from "@/lib/get-menu";
 import { DailyMenuForm } from "@/components/admin/DailyMenuForm";
+import { AdminPage, AdminPageHeader } from "@/components/admin/AdminPage";
 
 export default async function AdminDailyMenuPage() {
   const restaurant = await requireCurrentRestaurant();
   const dailyMenu = await getActiveDailyMenu(restaurant.id);
 
   return (
-    <div>
-      <div className="border-b border-neutral-200 bg-white px-4 py-3">
-        <h1 className="text-base font-semibold text-neutral-900">Menu du jour</h1>
-      </div>
+    <AdminPage width="narrow">
+      <AdminPageHeader title="Menu du jour" description="Mets à jour le menu proposé aujourd’hui à tes clients." />
       <DailyMenuForm dailyMenu={dailyMenu} />
-    </div>
+    </AdminPage>
   );
 }

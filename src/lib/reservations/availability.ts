@@ -75,14 +75,32 @@ export function computeAvailableSlots({
     const opens = toMinutes(service.opens_at!);
     const closes = toMinutes(service.closes_at!);
 
-    for (let t = opens; t + settings.slot_interval_minutes <= closes; t += settings.slot_interval_minutes) {
+    const lastStart = closes - (settings.last_booking_before_close_minutes ?? 30);
+    const duration = settings.meal_duration_minutes ?? 90;
+    const totalSeats = settings.total_seats ?? 40;
+
+    for (let t = opens; t <= lastStart; t += settings.slot_interval_minutes) {
       if (isToday && t < minMinutesFromNow) continue;
 
       const time = minutesToHHMM(t);
-      const booked = activeReservations
+      // Places occupées à un instant donné : repas en cours (début <= instant < début + durée).
+      const occupancyAt = (point: number) =>
+        activeReservations
+          .filter((r) => {
+            const start = toMinutes(r.reservation_time);
+            return start <= point && point < start + duration;
+          })
+          .reduce((sum, r) => sum + r.party_size, 0);
+      // Le nouveau groupe occupera [t, t + durée) : on vérifie le pic d'occupation sur cette fenêtre.
+      const checkpoints = [
+        t,
+        ...activeReservations.map((r) => toMinutes(r.reservation_time)).filter((start) => start > t && start < t + duration),
+      ];
+      const peak = Math.max(...checkpoints.map(occupancyAt));
+      const arrivals = activeReservations
         .filter((r) => r.reservation_time.slice(0, 5) === time)
         .reduce((sum, r) => sum + r.party_size, 0);
-      const remaining = settings.max_covers_per_slot - booked;
+      const remaining = Math.min(totalSeats - peak, settings.max_covers_per_slot - arrivals);
 
       if (remaining >= partySize) {
         slots.push({ time, remaining });
@@ -99,6 +117,9 @@ export function defaultReservationSettings(restaurantId: string): ReservationSet
     restaurant_id: restaurantId,
     slot_interval_minutes: 30,
     max_covers_per_slot: 20,
+    total_seats: 40,
+    meal_duration_minutes: 90,
+    last_booking_before_close_minutes: 30,
     max_party_size_online: 8,
     min_advance_hours: 2,
     max_advance_days: 30,

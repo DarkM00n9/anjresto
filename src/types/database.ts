@@ -24,6 +24,8 @@ export type LayoutStyle =
   | "moderne_epure"
   | "mediterraneen";
 
+export type RestaurantStatus = "demo" | "active" | "suspended";
+
 export type ReservationStatus =
   | "pending"
   | "confirmed"
@@ -45,7 +47,7 @@ export interface Restaurant {
   id: string;
   slug: string;
   custom_domain: string | null;
-  is_published: boolean;
+  status: RestaurantStatus;
   name: string;
   tagline: string | null;
   description: string | null;
@@ -66,7 +68,33 @@ export interface Restaurant {
   siret: string | null;
   legal_representative: string | null;
   theme: RestaurantTheme;
+  google_reviews_url: string | null;
+  google_rating: number | null;
+  google_reviews_count: number | null;
+  subscription_status: "trial" | "paid" | "unpaid";
+  paid_until: string | null;
+  monthly_price: number;
   created_at: string;
+  updated_at: string;
+}
+
+export interface WaitlistEntry {
+  id: string;
+  restaurant_id: string;
+  wanted_date: string;
+  party_size: number;
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string | null;
+  status: "waiting" | "notified" | "done";
+  created_at: string;
+}
+
+export interface CustomerNote {
+  restaurant_id: string;
+  phone: string;
+  note: string | null;
+  is_vip: boolean;
   updated_at: string;
 }
 
@@ -168,6 +196,9 @@ export interface ReservationSettings {
   restaurant_id: string;
   slot_interval_minutes: 15 | 30;
   max_covers_per_slot: number;
+  total_seats: number;
+  meal_duration_minutes: number;
+  last_booking_before_close_minutes: number;
   max_party_size_online: number;
   min_advance_hours: number;
   max_advance_days: number;
@@ -181,5 +212,12 @@ export interface BlockedService {
   date: string; // "YYYY-MM-DD"
   opens_at: string; // "HH:MM:SS"
   closes_at: string;
+  created_at: string;
+}
+
+export interface ImpersonationLog {
+  id: string;
+  superadmin_id: string;
+  restaurant_id: string;
   created_at: string;
 }

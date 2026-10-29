@@ -1,22 +1,23 @@
 import type { MenuItem } from "@/types/database";
+import { Sparkles } from "lucide-react";
 
 export function DailySpecialBanner({ items }: { items: MenuItem[] }) {
   const specials = items.filter((item) => item.is_daily_special && item.is_available);
   if (specials.length === 0) return null;
 
   return (
-    <div className="mx-4 mt-4 rounded-2xl bg-[var(--color-primary)]/10 p-4 sm:mx-6">
-      <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-primary)]">
-        Suggestion du chef
-      </p>
-      <ul className="mt-2 space-y-1">
+    <div className="mx-auto mt-4 max-w-4xl px-4 sm:px-6">
+      <div className="border-y border-[var(--color-primary)]/20 px-5 py-6 sm:px-7">
+      <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]"><Sparkles className="h-3.5 w-3.5" />Suggestion du chef</p>
+      <ul className="mt-3 divide-y divide-black/[0.07]">
         {specials.map((item) => (
-          <li key={item.id} className="flex items-baseline justify-between gap-4 text-sm">
-            <span className="font-medium text-black/80">{item.name}</span>
-            <span className="font-semibold text-[var(--color-primary)]">{item.price.toFixed(2)} €</span>
+          <li key={item.id} className="flex items-baseline justify-between gap-4 py-3 text-sm first:pt-2 last:pb-0">
+            <span className="font-[family-name:var(--font-title)] text-base font-medium text-[var(--color-secondary)] sm:text-lg">{item.name}</span>
+            <span className="whitespace-nowrap text-sm font-semibold tabular-nums text-[var(--color-primary)]">{item.price.toFixed(2)} €</span>
           </li>
         ))}
       </ul>
+      </div>
     </div>
   );
 }

@@ -35,17 +35,18 @@ export function CategoryTabs({ categories }: CategoryTabsProps) {
   if (categories.length === 0) return null;
 
   return (
-    <nav className="sticky top-0 z-20 overflow-x-auto border-b border-black/5 bg-[var(--background)]/95 backdrop-blur">
-      <ul className="flex min-w-max gap-2 px-4 py-3 sm:px-6">
+    <nav aria-label="Catégories de la carte" className="sticky top-[58px] z-20 overflow-x-auto border-b border-black/[0.08] bg-white/95 backdrop-blur-xl sm:top-[61px]">
+      <ul className="mx-auto flex min-w-max max-w-7xl gap-7 px-4 sm:gap-9 sm:px-6 lg:px-8">
         {categories.map((category) => (
           <li key={category.id}>
             <button
               type="button"
               onClick={() => scrollTo(category.id)}
-              className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+              aria-pressed={activeId === category.id}
+              className={`relative whitespace-nowrap py-4 text-[11px] font-semibold uppercase tracking-[0.14em] transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-left after:transition-transform ${
                 activeId === category.id
-                  ? "bg-[var(--color-primary)] text-white"
-                  : "bg-black/5 text-black/60"
+                  ? "text-[var(--color-primary)] after:scale-x-100 after:bg-[var(--color-primary)]"
+                  : "text-stone-600 after:scale-x-0 after:bg-[var(--color-primary)] hover:text-[var(--color-primary)] hover:after:scale-x-100"
               }`}
             >
               {category.name}

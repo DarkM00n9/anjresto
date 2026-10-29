@@ -1,4 +1,4 @@
-import type { Reservation, Restaurant } from "@/types/database";
+import type { Reservation, Restaurant, WaitlistEntry } from "@/types/database";
 
 interface EmailContent {
   subject: string;
@@ -145,6 +145,49 @@ export function restaurantNewReservationEmail(
                 ${button(refuseUrl, "Refuser", "#dc2626")}
               </div>`
        }`,
+    ),
+  };
+}
+
+export function waitlistSpotEmail(restaurant: Restaurant, entry: WaitlistEntry, baseUrl: string): EmailContent {
+  const color = restaurant.theme.primary_color;
+  return {
+    subject: `Une place s'est libérée — ${restaurant.name}`,
+    html: baseLayout(
+      restaurant,
+      color,
+      `<p>Bonjour ${entry.customer_name},</p>
+       <p>Bonne nouvelle : une table vient peut-être de se libérer le ${formatDate(entry.wanted_date)} pour ${entry.party_size} personne${entry.party_size > 1 ? "s" : ""}.</p>
+       <p>Les places partent vite, réservez dès maintenant :</p>
+       ${button(`${baseUrl}/reservation`, "Réserver maintenant", color)}`,
+    ),
+  };
+}
+
+export function serviceCancelledEmail(restaurant: Restaurant, reservation: Reservation, message: string): EmailContent {
+  return {
+    subject: `Votre réservation est annulée — ${restaurant.name}`,
+    html: baseLayout(
+      restaurant,
+      restaurant.theme.primary_color,
+      `<p>Bonjour ${reservation.customer_name},</p>
+       <p>Nous devons malheureusement annuler votre réservation du ${formatDate(reservation.reservation_date)} à ${reservation.reservation_time.slice(0, 5)}.</p>
+       ${message ? `<p style="background:#f9fafb;border-radius:12px;padding:12px 16px;">${message.replace(/</g, "&lt;")}</p>` : ""}
+       <p>Nous sommes sincèrement désolés${restaurant.phone ? ` et restons joignables au ${restaurant.phone}` : ""}.</p>`,
+    ),
+  };
+}
+
+export function customerCancelledEmail(restaurant: Restaurant, reservation: Reservation): EmailContent {
+  return {
+    subject: `Réservation annulée — ${restaurant.name}`,
+    html: baseLayout(
+      restaurant,
+      restaurant.theme.primary_color,
+      `<p>Bonjour ${reservation.customer_name},</p>
+       <p>Nous sommes au regret de vous informer que votre réservation du
+       ${formatDate(reservation.reservation_date)} à ${reservation.reservation_time.slice(0, 5)} a dû être annulée.</p>
+       <p>N'hésitez pas à nous contacter pour retrouver un créneau${restaurant.phone ? ` : ${restaurant.phone}` : ""}.</p>`,
     ),
   };
 }

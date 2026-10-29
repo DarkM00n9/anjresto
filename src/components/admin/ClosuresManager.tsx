@@ -4,6 +4,12 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Closure } from "@/types/database";
 import { createClosure, deleteClosure } from "@/app/admin/actions/hours";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import { Plus, Trash2 } from "lucide-react";
+import { IconButton } from "@/components/ui/IconButton";
 
 export function ClosuresManager({ closures }: { closures: Closure[] }) {
   const router = useRouter();
@@ -33,68 +39,46 @@ export function ClosuresManager({ closures }: { closures: Closure[] }) {
   }
 
   return (
-    <div className="px-4 pb-6 sm:px-6">
-      <h2 className="text-sm font-semibold text-neutral-700">Fermetures exceptionnelles</h2>
-      <p className="mt-1 text-xs text-neutral-500">
+    <div className="mt-8 border-t border-slate-300 pt-7">
+      <h2 className="text-lg font-semibold tracking-tight text-slate-900">Fermetures exceptionnelles</h2>
+      <p className="mt-1 text-sm text-slate-700">
         Vacances, jours fériés... affiché comme &quot;Fermé&quot; sur le site.
       </p>
 
       {closures.length > 0 && (
-        <ul className="mt-3 flex flex-col gap-2">
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2">
           {closures.map((c) => (
-            <li key={c.id} className="flex items-center justify-between rounded-xl bg-white p-3 shadow-sm">
+            <li key={c.id} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-300 bg-white p-4 shadow-sm">
               <div>
-                <p className="text-sm font-medium text-neutral-900">
+                <p className="text-sm font-semibold text-slate-900">
                   {c.start_date} → {c.end_date}
                 </p>
-                {c.message && <p className="text-xs text-neutral-500">{c.message}</p>}
+                {c.message && <p className="mt-1 text-xs leading-5 text-slate-700">{c.message}</p>}
               </div>
-              <button type="button" onClick={() => handleDelete(c.id)} className="px-2 text-sm text-red-500">
-                ✕
-              </button>
+              <IconButton type="button" tone="danger" onClick={() => handleDelete(c.id)} aria-label="Supprimer cette fermeture">
+                <Trash2 className="h-4 w-4" />
+              </IconButton>
             </li>
           ))}
         </ul>
       )}
 
       {open ? (
-        <div className="mt-3 flex flex-col gap-2 rounded-2xl bg-white p-4 shadow-sm">
-          <div className="flex gap-2">
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="flex-1 rounded-lg border border-neutral-300 px-2 py-2 text-sm"
-            />
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="flex-1 rounded-lg border border-neutral-300 px-2 py-2 text-sm"
-            />
+        <Card className="mt-4 space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input id="closure-start" label="Du" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+            <Input id="closure-end" label="Au" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
           </div>
-          <input
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Message (ex : Fermeture annuelle, réouverture le 15 août)"
-            className="rounded-lg border border-neutral-300 px-3 py-2 text-sm"
-          />
-          <button
-            type="button"
-            onClick={handleCreate}
-            disabled={isPending}
-            className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-          >
-            Ajouter
-          </button>
-        </div>
+          <Textarea id="closure-message" label="Message affiché aux clients" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Ex. Fermeture annuelle, réouverture le 15 août" rows={2} />
+          <Button type="button" variant="accent" onClick={handleCreate} loading={isPending} disabled={!startDate || !endDate} icon={<Plus className="h-4 w-4" />}>Ajouter cette fermeture</Button>
+        </Card>
       ) : (
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="mt-3 w-full rounded-2xl border-2 border-dashed border-neutral-300 py-3 text-sm font-medium text-neutral-500"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-indigo-200 bg-indigo-50/40 py-4 text-sm font-semibold text-indigo-700 transition-colors hover:border-indigo-300 hover:bg-indigo-50"
         >
-          + Fermeture exceptionnelle
+          <Plus className="h-4 w-4" /> Ajouter une fermeture
         </button>
       )}
     </div>

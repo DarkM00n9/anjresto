@@ -8,6 +8,10 @@ import { dailyMenuSchema, type DailyMenuInput, type DailyMenuFormInput } from "@
 import type { DailyMenu } from "@/types/database";
 import { todayInParis } from "@/lib/closures";
 import { upsertDailyMenu, deleteDailyMenu } from "@/app/admin/actions/daily-menu";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { Toggle } from "@/components/ui/Toggle";
 
 export function DailyMenuForm({ dailyMenu }: { dailyMenu: DailyMenu | null }) {
   const router = useRouter();
@@ -52,81 +56,37 @@ export function DailyMenuForm({ dailyMenu }: { dailyMenu: DailyMenu | null }) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 px-4 py-6 sm:px-6">
-      <p className="text-sm text-neutral-500">
-        Valable uniquement aujourd&apos;hui — désactivé automatiquement à minuit.
-      </p>
+    <form onSubmit={handleSubmit(onSubmit)} className="mx-auto w-full max-w-3xl space-y-5">
+      <Card className="space-y-5 sm:p-7">
+        <p className="rounded-xl border border-indigo-100 bg-indigo-50/60 px-4 py-3 text-sm leading-6 text-indigo-900">
+          Ce menu est affiché uniquement pour aujourd’hui et se désactive automatiquement à minuit.
+        </p>
 
-      <label className="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm">
-        <span className="text-sm font-medium text-neutral-700">Actif aujourd&apos;hui</span>
-        <input type="checkbox" {...register("is_active")} className="h-6 w-6 rounded" />
-      </label>
+        <div className="flex items-center justify-between rounded-xl border border-slate-300 px-4 py-3.5">
+          <div>
+            <p className="text-sm font-semibold text-slate-900">Actif aujourd’hui</p>
+            <p className="mt-0.5 text-xs text-slate-700">Affiche ce menu sur le site public.</p>
+          </div>
+          <Toggle {...register("is_active")} aria-label="Activer le menu du jour" />
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium text-neutral-700">Titre</label>
-        <input
-          {...register("title")}
-          className="mt-1 w-full rounded-xl border border-neutral-300 px-4 py-3 text-base"
-        />
-        {errors.title && <p className="mt-1 text-xs text-red-600">{errors.title.message}</p>}
+        <div className="grid gap-5 sm:grid-cols-[1fr_11rem]">
+          <Input id="daily-title" label="Titre" {...register("title")} error={errors.title?.message} />
+          <Input id="daily-price" label="Prix (€)" type="number" step="0.10" inputMode="decimal" {...register("price")} error={errors.price?.message} />
+        </div>
+        <div className="grid gap-5 sm:grid-cols-3">
+          <Input id="daily-starter" label="Entrée" {...register("starter")} placeholder="Soupe du marché" />
+          <Input id="daily-main" label="Plat" {...register("main")} placeholder="Plat du jour" />
+          <Input id="daily-dessert" label="Dessert" {...register("dessert")} placeholder="Dessert maison" />
+        </div>
+      </Card>
+
+      {serverError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{serverError}</p>}
+
+      <div className="flex flex-col gap-3 sm:flex-row-reverse">
+        <Button type="submit" variant="accent" size="lg" loading={isPending} className="w-full sm:flex-1">Enregistrer le menu</Button>
+        {dailyMenu && <Button type="button" variant="danger" disabled={isPending} onClick={handleDelete} className="w-full sm:w-auto">Supprimer le menu</Button>}
       </div>
-
-      <div>
-        <label className="block text-sm font-medium text-neutral-700">Entrée</label>
-        <input
-          {...register("starter")}
-          className="mt-1 w-full rounded-xl border border-neutral-300 px-4 py-3 text-base"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-neutral-700">Plat</label>
-        <input
-          {...register("main")}
-          className="mt-1 w-full rounded-xl border border-neutral-300 px-4 py-3 text-base"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-neutral-700">Dessert</label>
-        <input
-          {...register("dessert")}
-          className="mt-1 w-full rounded-xl border border-neutral-300 px-4 py-3 text-base"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-neutral-700">Prix (€)</label>
-        <input
-          type="number"
-          step="0.10"
-          inputMode="decimal"
-          {...register("price")}
-          className="mt-1 w-full rounded-xl border border-neutral-300 px-4 py-3 text-base"
-        />
-        {errors.price && <p className="mt-1 text-xs text-red-600">{errors.price.message}</p>}
-      </div>
-
-      {serverError && <p className="text-sm text-red-600">{serverError}</p>}
-
-      <button
-        type="submit"
-        disabled={isPending}
-        className="w-full rounded-xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white disabled:opacity-50"
-      >
-        {isPending ? "Enregistrement..." : "Enregistrer"}
-      </button>
-
-      {dailyMenu && (
-        <button
-          type="button"
-          onClick={handleDelete}
-          disabled={isPending}
-          className="w-full rounded-xl border border-red-200 px-4 py-3 text-sm font-medium text-red-600"
-        >
-          Supprimer le menu du jour
-        </button>
-      )}
     </form>
   );
 }

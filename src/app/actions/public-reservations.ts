@@ -2,7 +2,8 @@
 
 import { headers } from "next/headers";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { reservationFormSchema, type ReservationFormInput } from "@/lib/schemas";
+import { reservationFormSchema, waitlistSchema, type ReservationFormInput } from "@/lib/schemas";
+import { notifyWaitlist } from "@/lib/waitlist";
 import { computeAvailableSlots, defaultReservationSettings, type AvailableSlot } from "@/lib/reservations/availability";
 import { buildPublicOrigin } from "@/lib/url";
 import { sendEmail } from "@/lib/email/resend";
@@ -46,7 +47,7 @@ async function loadAvailabilityContext(restaurantId: string, date: string) {
     ]);
 
   return {
-    settings: (settings as ReservationSettings | null) ?? defaultReservationSettings(restaurantId),
+    settings: { ...defaultReservationSettings(restaurantId), ...((settings as Partial<ReservationSettings> | null) ?? {}) },
     hours: (hours ?? []) as OpeningHour[],
     closures: (closures ?? []) as Closure[],
     blockedServices: (blocked ?? []) as BlockedService[],
@@ -84,7 +85,7 @@ export async function createPublicReservation(
     .from("restaurants")
     .select("*")
     .eq("id", restaurantId)
-    .eq("is_published", true)
+    .in("status", ["demo", "active"])
     .maybeSingle();
   if (!restaurant) return { success: false, error: "Restaurant introuvable." };
 
@@ -170,6 +171,49 @@ export async function cancelReservationByToken(token: string) {
   if (reservation.status === "cancelled") return { success: true, alreadyDone: true };
 
   await supabase.from("reservations").update({ status: "cancelled" }).eq("id", reservation.id);
+
+  const { data: restaurant } = await supabase.from("restaurants").select("*").eq("id", reservation.restaurant_id).maybeSingle();
+  if (restaurant) await notifyWaitlist(restaurant as Restaurant, reservation.reservation_date);
+  return { success: true };
+}
+
+export async function joinWaitlist(
+  restaurantId: string,
+  entry: { date: string; party_size: number; name: string; phone: string; email: string },
+  honeypot: string,
+): Promise<{ success: boolean; error?: string }> {
+  if (honeypot) return { success: true };
+  const parsed = waitlistSchema.safeParse(entry);
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? "Informations invalides." };
+
+  const supabase = createAdminClient();
+  const { data: restaurant } = await supabase
+    .from("restaurants")
+    .select("id")
+    .eq("id", restaurantId)
+    .in("status", ["demo", "active"])
+    .maybeSingle();
+  if (!restaurant) return { success: false, error: "Restaurant introuvable." };
+
+  const ip = await getClientIp();
+  const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MINUTES * 60 * 1000).toISOString();
+  const { count } = await supabase
+    .from("reservation_rate_limits")
+    .select("id", { count: "exact", head: true })
+    .eq("ip", ip)
+    .gte("created_at", windowStart);
+  if ((count ?? 0) >= RATE_LIMIT_MAX_ATTEMPTS) return { success: false, error: "Trop de tentatives. Réessaie dans quelques minutes." };
+  await supabase.from("reservation_rate_limits").insert({ ip, restaurant_id: restaurantId });
+
+  const { error } = await supabase.from("waitlist").insert({
+    restaurant_id: restaurantId,
+    wanted_date: parsed.data.date,
+    party_size: parsed.data.party_size,
+    customer_name: parsed.data.name,
+    customer_phone: parsed.data.phone,
+    customer_email: parsed.data.email || null,
+  });
+  if (error) return { success: false, error: "Une erreur est survenue." };
   return { success: true };
 }
 

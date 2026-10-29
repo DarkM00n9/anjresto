@@ -147,3 +147,12 @@ le flux de réservation sans compte Resend.
 Pour l'instant (avant l'espace `/superadmin`, Phase 4), insérer une ligne dans la
 table `restaurants` (slug unique) + ses `categories` / `menu_items` / `opening_hours`
 suffit à faire apparaître son site — sans toucher au code.
+
+## Fonctionnalités ajoutées (croissance)
+
+Migration à exécuter dans Supabase (SQL Editor) : `0012_reservation_capacity.sql` puis `0013_growth_features.sql`.
+
+- **Admin** : `/admin/statistiques` (couverts par semaine, no-show, jours/heures chargés), `/admin/clients` (historique, notes, VIP), alerte sonore des nouvelles réservations (cloche dans l'en-tête), liste d'attente par jour, « Annuler le service » (annule + prévient les clients par e-mail).
+- **Site** : filtres de la carte (végétarien, vegan, sans gluten), export PDF de la carte (impression), bloc note Google (à renseigner dans Infos), ajout au calendrier après réservation, inscription en liste d'attente quand c'est complet.
+- **Superadmin** : tableau de bord global (revenu mensuel, impayés, inactifs), facturation par restaurant, duplication d'un restaurant modèle.
+- **À faire côté vous** : clé Resend + domaine vérifié (`RESEND_API_KEY`, `RESEND_FROM_EMAIL`) pour que les e-mails partent vraiment ; déploiement Vercel avec `CRON_SECRET`.

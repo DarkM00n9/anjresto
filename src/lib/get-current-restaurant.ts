@@ -9,6 +9,10 @@ import type { Restaurant } from "@/types/database";
  * - `x-restaurant-slug` (mode local /r/{slug})
  * - `x-restaurant-host` (prod : sous-domaine {slug}.ROOT_DOMAIN ou domaine personnalisé)
  *
+ * Ne filtre volontairement pas par statut : un resto `suspended` doit quand même
+ * être résolu pour que (site)/layout.tsx puisse afficher la page "indisponible"
+ * plutôt qu'un simple 404. C'est à l'appelant de vérifier `restaurant.status`.
+ *
  * Mis en cache par requête (React `cache`) pour éviter les doublons entre
  * layout, page et generateMetadata.
  */
@@ -21,7 +25,7 @@ export const getCurrentRestaurant = cache(
     const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN;
 
     const supabase = await createClient();
-    const query = supabase.from("restaurants").select("*").eq("is_published", true);
+    const query = supabase.from("restaurants").select("*");
 
     let result;
     if (slug) {

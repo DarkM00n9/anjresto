@@ -3,9 +3,11 @@ import { requireCurrentRestaurant, getBaseUrl } from "@/lib/get-current-restaura
 import { getMenu, getActiveDailyMenu } from "@/lib/get-menu";
 import { buildMenuJsonLd } from "@/lib/seo";
 import { CategoryTabs } from "@/components/carte/CategoryTabs";
-import { MenuItemCard } from "@/components/carte/MenuItemCard";
+import { CarteList } from "@/components/carte/CarteList";
 import { DailySpecialBanner } from "@/components/carte/DailySpecialBanner";
 import { DailyMenuBanner } from "@/components/carte/DailyMenuBanner";
+import { ButtonLink } from "@/components/ui/Button";
+import { ArrowUpRight } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
   const restaurant = await requireCurrentRestaurant();
@@ -29,29 +31,27 @@ export default async function CartePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <section className="bg-stone-200 px-4 py-14 sm:py-20">
+        <div className="mx-auto grid max-w-6xl items-end gap-8 md:grid-cols-[1fr_auto]">
+          <div>
+            <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-primary)]">
+              <span className="h-px w-8 bg-[var(--color-primary)]" />À découvrir
+            </p>
+            <h1 className="mt-5 max-w-4xl font-[family-name:var(--font-title)] text-4xl font-normal leading-[1.05] tracking-[-0.035em] text-[var(--color-secondary)] sm:text-6xl">
+              La carte de {restaurant.name}
+            </h1>
+            {restaurant.tagline && <p className="mt-4 max-w-xl text-base leading-7 text-stone-700">{restaurant.tagline}</p>}
+          </div>
+          <div className="flex flex-col items-start gap-3 border-l border-black/10 pl-5 md:items-end md:border-l-0 md:pl-0">
+            {restaurant.cuisine_type && <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-600">{restaurant.cuisine_type}</p>}
+            <ButtonLink href="/reservation" variant="outline" size="sm" icon={<ArrowUpRight className="h-3.5 w-3.5" />}>Réserver une table</ButtonLink>
+          </div>
+        </div>
+      </section>
       <CategoryTabs categories={sortedCategories} />
       <DailyMenuBanner dailyMenu={dailyMenu} />
       <DailySpecialBanner items={items} />
-      <div className="mx-auto max-w-2xl px-4 sm:px-6">
-        {sortedCategories.map((category) => (
-          <section key={category.id} id={`categorie-${category.id}`} className="pt-8">
-            <h2 className="font-[family-name:var(--font-title)] text-2xl font-bold text-[var(--color-secondary)]">
-              {category.name}
-            </h2>
-            {category.description && (
-              <p className="mt-1 text-sm text-black/60">{category.description}</p>
-            )}
-            <ul className="mt-2 divide-y divide-black/5">
-              {items
-                .filter((item) => item.category_id === category.id)
-                .sort((a, b) => a.display_order - b.display_order)
-                .map((item) => (
-                  <MenuItemCard key={item.id} item={item} />
-                ))}
-            </ul>
-          </section>
-        ))}
-      </div>
+      <CarteList categories={sortedCategories} items={items} />
     </div>
   );
 }

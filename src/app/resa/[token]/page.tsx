@@ -31,7 +31,7 @@ export default async function RestaurantActionPage({
           <p className="text-lg font-semibold text-neutral-900">
             Réservation {result.status === "confirmed" ? "acceptée" : "refusée"} ✓
             <br />
-            <span className="text-sm font-normal text-neutral-500">Le client a été prévenu par email.</span>
+            <span className="text-sm font-normal text-slate-600">Le client a été prévenu par email.</span>
           </p>
         )}
       </div>

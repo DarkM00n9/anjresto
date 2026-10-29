@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useTransition, type FormEvent } from "react";
-import Link from "next/link";
+import { useId, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
   DndContext,
@@ -18,6 +17,10 @@ import { CategoryRow } from "./CategoryRow";
 import { MenuItemRow } from "./MenuItemRow";
 import { reorderCategories, createCategory } from "@/app/admin/actions/categories";
 import { reorderMenuItems } from "@/app/admin/actions/menu-items";
+import { AdminPage, AdminPageHeader } from "./AdminPage";
+import { Button, ButtonLink } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Plus, UtensilsCrossed } from "lucide-react";
 
 interface CarteManagerProps {
   categories: Category[];
@@ -26,6 +29,7 @@ interface CarteManagerProps {
 
 export function CarteManager({ categories: initialCategories, items: initialItems }: CarteManagerProps) {
   const router = useRouter();
+  const dragContextId = useId();
   const [categories, setCategories] = useState(initialCategories);
   const [items, setItems] = useState(initialItems);
 
@@ -52,55 +56,61 @@ export function CarteManager({ categories: initialCategories, items: initialItem
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    setCategories((current) => {
-      const oldIndex = current.findIndex((c) => c.id === active.id);
-      const newIndex = current.findIndex((c) => c.id === over.id);
-      const next = arrayMove(current, oldIndex, newIndex);
-      reorderCategories(next.map((c) => c.id));
-      return next;
-    });
+    const oldIndex = categories.findIndex((c) => c.id === active.id);
+    const newIndex = categories.findIndex((c) => c.id === over.id);
+    const next = arrayMove(categories, oldIndex, newIndex);
+    setCategories(next);
+    void reorderCategories(next.map((c) => c.id));
   }
 
   function handleItemDragEnd(categoryId: string, event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    setItems((current) => {
-      const categoryItems = current.filter((i) => i.category_id === categoryId);
-      const otherItems = current.filter((i) => i.category_id !== categoryId);
-      const oldIndex = categoryItems.findIndex((i) => i.id === active.id);
-      const newIndex = categoryItems.findIndex((i) => i.id === over.id);
-      const reordered = arrayMove(categoryItems, oldIndex, newIndex);
-      reorderMenuItems(reordered.map((i) => i.id));
-      return [...otherItems, ...reordered];
-    });
+    const categoryItems = items.filter((i) => i.category_id === categoryId);
+    const otherItems = items.filter((i) => i.category_id !== categoryId);
+    const oldIndex = categoryItems.findIndex((i) => i.id === active.id);
+    const newIndex = categoryItems.findIndex((i) => i.id === over.id);
+    const reordered = arrayMove(categoryItems, oldIndex, newIndex);
+    setItems([...otherItems, ...reordered]);
+    void reorderMenuItems(reordered.map((i) => i.id));
   }
 
   return (
-    <div className="px-4 py-6 sm:px-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-neutral-900">Ma carte</h1>
-        <Link
-          href="/admin/carte/plats/nouveau"
-          className="rounded-full bg-neutral-900 px-4 py-2 text-sm font-semibold text-white"
-        >
-          + Plat
-        </Link>
+    <AdminPage>
+      <AdminPageHeader
+        title="Ma carte"
+        description="Organise les catégories et garde tes plats à jour en quelques clics."
+        action={<ButtonLink href="/admin/carte/plats/nouveau" variant="accent" icon={<Plus className="h-4 w-4" />}>Ajouter un plat</ButtonLink>}
+      />
+
+      <div className="mb-5 flex flex-wrap gap-2">
+        <span className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700">
+          {categories.length} {categories.length === 1 ? "catégorie" : "catégories"}
+        </span>
+        <span className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700">
+          {items.length} {items.length === 1 ? "plat" : "plats"}
+        </span>
       </div>
 
       {categories.length === 0 ? (
-        <p className="mt-6 text-sm text-neutral-500">
-          Commence par créer une catégorie (ex : Entrées, Plats, Desserts).
-        </p>
+        <Card className="flex flex-col items-center px-6 py-10 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+            <UtensilsCrossed className="h-6 w-6" />
+          </span>
+          <h2 className="mt-4 text-base font-semibold text-slate-900">Ta carte commence ici</h2>
+          <p className="mt-1 max-w-sm text-sm leading-6 text-slate-700">Crée une première catégorie comme Entrées, Plats ou Desserts, puis ajoute tes spécialités.</p>
+        </Card>
       ) : (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
+        <DndContext id={`${dragContextId}-categories`} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
           <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
             <div className="mt-4 flex flex-col gap-4">
               {categories.map((category) => (
-                <div key={category.id} className="rounded-2xl bg-white p-3 shadow-sm">
+                <Card key={category.id} className="p-3 sm:p-4">
                   <CategoryRow category={category} onDeleted={() => router.refresh()} />
 
                   <DndContext
+                    id={`${dragContextId}-items-${category.id}`}
                     sensors={sensors}
                     collisionDetection={closestCenter}
                     onDragEnd={(e) => handleItemDragEnd(category.id, e)}
@@ -109,7 +119,7 @@ export function CarteManager({ categories: initialCategories, items: initialItem
                       items={items.filter((i) => i.category_id === category.id).map((i) => i.id)}
                       strategy={verticalListSortingStrategy}
                     >
-                      <ul className="mt-1 divide-y divide-neutral-100">
+                      <ul className="mt-1 divide-y divide-slate-200">
                         {items
                           .filter((i) => i.category_id === category.id)
                           .map((item) => (
@@ -120,9 +130,9 @@ export function CarteManager({ categories: initialCategories, items: initialItem
                   </DndContext>
 
                   {items.filter((i) => i.category_id === category.id).length === 0 && (
-                    <p className="px-1 py-2 text-xs text-neutral-400">Aucun plat dans cette catégorie.</p>
+                    <p className="px-1 py-2 text-xs text-slate-700">Aucun plat dans cette catégorie.</p>
                   )}
-                </div>
+                </Card>
               ))}
             </div>
           </SortableContext>
@@ -130,7 +140,7 @@ export function CarteManager({ categories: initialCategories, items: initialItem
       )}
 
       <AddCategoryForm onCreated={() => router.refresh()} />
-    </div>
+    </AdminPage>
   );
 }
 
@@ -156,29 +166,26 @@ function AddCategoryForm({ onCreated }: { onCreated: () => void }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-4 w-full rounded-2xl border-2 border-dashed border-neutral-300 py-3 text-sm font-medium text-neutral-500"
+        className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-indigo-200 bg-indigo-50/40 py-4 text-sm font-semibold text-indigo-700 transition-colors hover:border-indigo-300 hover:bg-indigo-50"
       >
-        + Nouvelle catégorie
+        <Plus className="h-4 w-4" />
+        Nouvelle catégorie
       </button>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
+    <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-2 rounded-2xl border border-slate-300 bg-white p-3 shadow-sm sm:flex-row">
       <input
         autoFocus
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Nom de la catégorie"
-        className="flex-1 rounded-xl border border-neutral-300 px-4 py-3 text-base"
+        className="min-h-11 flex-1 rounded-xl border border-slate-300 px-4 py-2.5 text-base focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/10"
       />
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded-xl bg-neutral-900 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
-      >
+      <Button type="submit" variant="accent" size="md" loading={isPending}>
         Ajouter
-      </button>
+      </Button>
     </form>
   );
 }

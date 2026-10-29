@@ -23,10 +23,11 @@ export function AllergenCheckboxGroup({ value, onChange }: AllergenCheckboxGroup
             key={allergen}
             type="button"
             onClick={() => toggle(allergen)}
-            className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+            aria-pressed={active}
+            className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
               active
-                ? "border-neutral-900 bg-neutral-900 text-white"
-                : "border-neutral-300 bg-white text-neutral-600"
+                ? "border-indigo-600 bg-indigo-600 text-white"
+                : "border-slate-300 bg-white text-slate-700 hover:border-slate-300"
             }`}
           >
             {ALLERGEN_LABELS[allergen]}

@@ -1,24 +1,31 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CalendarDays, CheckCircle2, Clock3, LoaderCircle, Users } from "lucide-react";
 import { reservationFormSchema, type ReservationFormInput, type ReservationFormValues } from "@/lib/schemas";
 import type { ReservationSettings } from "@/types/database";
 import { getAvailableSlotsAction, createPublicReservation } from "@/app/actions/public-reservations";
 import { getBookableDateRange, type AvailableSlot } from "@/lib/reservations/availability";
 import { TimeSlotPicker } from "./TimeSlotPicker";
+import { WaitlistForm } from "./WaitlistForm";
+import { buildCalendarLinks } from "@/lib/calendar";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 
 interface ReservationFormProps {
   restaurantId: string;
   settings: ReservationSettings;
   restaurantPhone: string | null;
+  restaurantName: string;
+  restaurantAddress: string;
 }
 
-export function ReservationForm({ restaurantId, settings, restaurantPhone }: ReservationFormProps) {
+export function ReservationForm({ restaurantId, settings, restaurantPhone, restaurantName, restaurantAddress }: ReservationFormProps) {
   const { min, max } = getBookableDateRange(settings);
-  const [slots, setSlots] = useState<AvailableSlot[]>([]);
-  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [slotResponse, setSlotResponse] = useState<{ key: string; slots: AvailableSlot[] } | null>(null);
   const [honeypot, setHoneypot] = useState("");
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<{ status?: string } | null>(null);
@@ -27,7 +34,7 @@ export function ReservationForm({ restaurantId, settings, restaurantPhone }: Res
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     setValue,
     formState: { errors },
   } = useForm<ReservationFormValues, unknown, ReservationFormInput>({
@@ -44,24 +51,30 @@ export function ReservationForm({ restaurantId, settings, restaurantPhone }: Res
     },
   });
 
-  const date = watch("date");
-  const partySize = Number(watch("party_size"));
-  const time = watch("time");
+  const date = useWatch({ control, name: "date" });
+  const partySize = Number(useWatch({ control, name: "party_size" }));
+  const time = useWatch({ control, name: "time" });
   const partyTooLarge = partySize > settings.max_party_size_online;
+  const slotRequestKey = `${date}:${partySize}`;
+  const loadingSlots = Boolean(date && !partyTooLarge && slotResponse?.key !== slotRequestKey);
+  const slots = !date || partyTooLarge || slotResponse?.key !== slotRequestKey ? [] : slotResponse.slots;
 
   useEffect(() => {
-    if (!date || partyTooLarge) {
-      setSlots([]);
-      return;
-    }
-    setLoadingSlots(true);
+    if (!date || partyTooLarge) return;
+    let active = true;
     getAvailableSlotsAction(restaurantId, date, partySize)
       .then((available) => {
-        setSlots(available);
+        if (!active) return;
+        setSlotResponse({ key: slotRequestKey, slots: available });
         setValue("time", "");
       })
-      .finally(() => setLoadingSlots(false));
-  }, [restaurantId, date, partySize, partyTooLarge, setValue]);
+      .catch(() => {
+        if (active) setSlotResponse({ key: slotRequestKey, slots: [] });
+      });
+    return () => {
+      active = false;
+    };
+  }, [restaurantId, date, partySize, partyTooLarge, slotRequestKey, setValue]);
 
   function onSubmit(data: ReservationFormInput) {
     setServerError(null);
@@ -76,22 +89,40 @@ export function ReservationForm({ restaurantId, settings, restaurantPhone }: Res
   }
 
   if (result) {
+    const calendar = buildCalendarLinks({
+      title: `Réservation — ${restaurantName}`,
+      date,
+      time,
+      durationMinutes: settings.meal_duration_minutes,
+      location: restaurantAddress,
+    });
     return (
-      <div className="rounded-2xl bg-green-50 p-6 text-center">
-        <p className="text-lg font-semibold text-green-800">
+      <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-6 text-center sm:p-8">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-white text-emerald-600 shadow-sm">
+          <CheckCircle2 className="h-6 w-6" />
+        </span>
+        <p className="mt-4 text-xl font-semibold text-emerald-900">
           {result.status === "confirmed" ? "Réservation confirmée !" : "Demande envoyée !"}
         </p>
-        <p className="mt-2 text-sm text-green-700">
+        <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-emerald-800">
           {result.status === "confirmed"
-            ? "Vous recevrez un email de confirmation."
-            : "Le restaurant va la confirmer rapidement. Vous recevrez un email."}
+            ? "Votre table est réservée. Vous recevrez un email de confirmation."
+            : "Le restaurant va confirmer votre demande rapidement. Vous recevrez un email."}
         </p>
+        <div className="mt-5 flex flex-wrap justify-center gap-2">
+          <a href={calendar.google} target="_blank" rel="noopener noreferrer" className="rounded-full border border-emerald-700 bg-white px-4 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-100">
+            Google Agenda
+          </a>
+          <a href={calendar.icsHref} download="reservation.ics" className="rounded-full border border-emerald-700 bg-white px-4 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-100">
+            Apple / Outlook (.ics)
+          </a>
+        </div>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="relative flex flex-col gap-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="relative space-y-6">
       {/* Honeypot anti-spam : invisible pour un humain, souvent rempli par un bot. */}
       <input
         type="text"
@@ -103,101 +134,64 @@ export function ReservationForm({ restaurantId, settings, restaurantPhone }: Res
         className="absolute -left-[9999px] h-px w-px opacity-0"
       />
 
-      <div>
-        <label className="block text-sm font-medium text-neutral-700">Date</label>
-        <input
-          type="date"
-          min={min}
-          max={max}
-          {...register("date")}
-          className="mt-1 w-full rounded-xl border border-neutral-300 px-4 py-3 text-base"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-neutral-700">Nombre de personnes</label>
-        <input
-          type="number"
-          min={1}
-          max={50}
-          {...register("party_size")}
-          className="mt-1 w-full rounded-xl border border-neutral-300 px-4 py-3 text-base"
-        />
-      </div>
-
-      {partyTooLarge ? (
-        <p className="rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
-          Pour un groupe de plus de {settings.max_party_size_online} personnes, merci de nous appeler directement
-          {restaurantPhone ? ` au ${restaurantPhone}` : ""}.
-        </p>
-      ) : (
-        <div>
-          <label className="block text-sm font-medium text-neutral-700">Heure</label>
-          {loadingSlots ? (
-            <p className="mt-2 text-sm text-neutral-400">Chargement des créneaux...</p>
-          ) : slots.length === 0 ? (
-            <p className="mt-2 text-sm text-neutral-400">Aucun créneau disponible ce jour-là.</p>
-          ) : (
-            <TimeSlotPicker slots={slots} value={time} onChange={(t) => setValue("time", t)} />
-          )}
-          {errors.time && <p className="mt-1 text-xs text-red-600">Choisis un horaire.</p>}
+      <section>
+        <div className="mb-4 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500">
+          <CalendarDays className="h-4 w-4 text-[var(--color-primary)]" /> Date et nombre de convives
         </div>
-      )}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input id="reservation-date" label="Date" type="date" min={min} max={max} {...register("date")} />
+          <Input id="reservation-party-size" label="Nombre de personnes" type="number" min={1} max={50} {...register("party_size")} />
+        </div>
+      </section>
 
-      <div>
-        <label className="block text-sm font-medium text-neutral-700">Nom</label>
-        <input
-          {...register("customer_name")}
-          className="mt-1 w-full rounded-xl border border-neutral-300 px-4 py-3 text-base"
-        />
-        {errors.customer_name && <p className="mt-1 text-xs text-red-600">{errors.customer_name.message}</p>}
+      <section className="border-t border-stone-200 pt-5">
+        <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500">
+          <Clock3 className="h-4 w-4 text-[var(--color-primary)]" /> Choisissez votre horaire
+        </div>
+        {partyTooLarge ? (
+          <p className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+            Pour un groupe de plus de {settings.max_party_size_online} personnes, veuillez nous appeler directement
+            {restaurantPhone ? ` au ${restaurantPhone}` : ""}.
+          </p>
+        ) : loadingSlots ? (
+          <p className="flex items-center gap-2 py-2 text-sm text-stone-500"><LoaderCircle className="h-4 w-4 animate-spin" />Recherche des créneaux disponibles…</p>
+        ) : slots.length === 0 ? (
+          <>
+            <p className="rounded-xl bg-stone-200 px-4 py-3 text-sm text-stone-700">Aucun créneau disponible ce jour-là. Essayez une autre date.</p>
+            <WaitlistForm restaurantId={restaurantId} date={date} partySize={partySize} />
+          </>
+        ) : (
+          <TimeSlotPicker slots={slots} value={time} onChange={(t) => setValue("time", t)} />
+        )}
+        {errors.time && <p role="alert" className="mt-2 text-xs font-medium text-red-600">Choisissez un horaire.</p>}
+      </section>
+
+      <section className="space-y-4 border-t border-stone-200 pt-5">
+        <div className="mb-1 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500">
+          <Users className="h-4 w-4 text-[var(--color-primary)]" /> Vos coordonnées
+        </div>
+        <Input id="reservation-name" label="Nom complet" autoComplete="name" {...register("customer_name")} error={errors.customer_name?.message} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input id="reservation-phone" label="Téléphone" type="tel" autoComplete="tel" {...register("customer_phone")} error={errors.customer_phone?.message} />
+          <Input id="reservation-email" label="E-mail (facultatif)" type="email" autoComplete="email" {...register("customer_email")} error={errors.customer_email?.message} />
+        </div>
+        <Textarea id="reservation-notes" label="Message (facultatif)" rows={3} {...register("notes")} placeholder="Allergies, occasion particulière…" />
+      </section>
+
+      <div className="border-t border-stone-200 pt-5">
+        <label className="flex cursor-pointer items-start gap-3 text-sm leading-5 text-stone-600">
+          <input type="checkbox" {...register("consent")} className="mt-0.5 h-4 w-4 rounded border-stone-300 accent-[var(--color-primary)]" />
+          <span>J’accepte que mes données soient utilisées pour traiter ma réservation.</span>
+        </label>
+        {errors.consent && <p role="alert" className="mt-2 text-xs font-medium text-red-600">{errors.consent.message}</p>}
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-neutral-700">Téléphone</label>
-        <input
-          type="tel"
-          {...register("customer_phone")}
-          className="mt-1 w-full rounded-xl border border-neutral-300 px-4 py-3 text-base"
-        />
-        {errors.customer_phone && <p className="mt-1 text-xs text-red-600">{errors.customer_phone.message}</p>}
-      </div>
+      {serverError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{serverError}</p>}
 
-      <div>
-        <label className="block text-sm font-medium text-neutral-700">Email (optionnel)</label>
-        <input
-          type="email"
-          {...register("customer_email")}
-          className="mt-1 w-full rounded-xl border border-neutral-300 px-4 py-3 text-base"
-        />
-        {errors.customer_email && <p className="mt-1 text-xs text-red-600">{errors.customer_email.message}</p>}
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-neutral-700">Message (optionnel)</label>
-        <textarea
-          rows={2}
-          {...register("notes")}
-          placeholder="Allergies, occasion spéciale..."
-          className="mt-1 w-full rounded-xl border border-neutral-300 px-4 py-3 text-base"
-        />
-      </div>
-
-      <label className="flex items-start gap-2 text-sm text-neutral-600">
-        <input type="checkbox" {...register("consent")} className="mt-0.5 h-5 w-5 rounded" />
-        J&apos;accepte que mes données soient utilisées pour traiter ma réservation.
-      </label>
-      {errors.consent && <p className="text-xs text-red-600">{errors.consent.message}</p>}
-
-      {serverError && <p className="text-sm text-red-600">{serverError}</p>}
-
-      <button
-        type="submit"
-        disabled={isPending || partyTooLarge || !time}
-        className="w-full rounded-xl bg-[var(--color-primary)] px-4 py-4 text-lg font-semibold text-white disabled:opacity-50"
-      >
-        {isPending ? "Envoi..." : "Réserver"}
-      </button>
+      <Button type="submit" variant="primary" size="lg" loading={isPending} disabled={isPending || partyTooLarge || !time} className="w-full">
+        Envoyer ma demande
+      </Button>
+      <p className="text-center text-xs text-stone-600">Aucun paiement ne sera demandé en ligne.</p>
     </form>
   );
 }

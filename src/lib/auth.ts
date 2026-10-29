@@ -28,3 +28,13 @@ export async function requireOwnerForCurrentRestaurant(restaurantId: string): Pr
 
   return profile;
 }
+
+/** Pour /superadmin : exige une session valide avec le rôle `superadmin`. */
+export async function requireSuperadmin(): Promise<Profile> {
+  const profile = await getCurrentProfile();
+
+  if (!profile) redirect("/superadmin/login");
+  if (profile.role !== "superadmin") redirect("/superadmin/login?error=acces-refuse");
+
+  return profile;
+}

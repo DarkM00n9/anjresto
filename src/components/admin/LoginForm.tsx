@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Mail, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -24,9 +27,10 @@ export function LoginForm() {
 
   if (status === "sent") {
     return (
-      <div className="mt-8 rounded-2xl bg-green-50 p-6 text-center">
+      <div className="flex flex-col items-center gap-2 rounded-2xl bg-green-50 p-6 text-center">
+        <CheckCircle2 className="h-8 w-8 text-green-600" />
         <p className="text-base font-semibold text-green-800">Lien envoyé !</p>
-        <p className="mt-2 text-sm text-green-700">
+        <p className="text-sm text-green-700">
           Ouvre l&apos;email reçu à {email} et appuie sur le lien pour te connecter.
         </p>
       </div>
@@ -34,23 +38,19 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
-      <input
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <Input
         type="email"
         required
         autoFocus
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="ton@email.fr"
-        className="w-full rounded-xl border border-neutral-300 px-4 py-4 text-lg text-neutral-900"
+        className="py-4 text-lg"
       />
-      <button
-        type="submit"
-        disabled={status === "sending"}
-        className="w-full rounded-xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white disabled:opacity-50"
-      >
+      <Button type="submit" variant="accent" size="lg" loading={status === "sending"} icon={<Mail className="h-4 w-4" />}>
         {status === "sending" ? "Envoi..." : "Recevoir le lien de connexion"}
-      </button>
+      </Button>
       {status === "error" && (
         <p className="text-center text-sm text-red-600">
           Une erreur est survenue. Vérifie l&apos;adresse et réessaie.

@@ -26,6 +26,9 @@ export async function updateRestaurantInfo(input: RestaurantInfoInput) {
       logo_url: data.logo_url || null,
       cover_image_url: data.cover_image_url || null,
       gallery_urls: data.gallery_urls,
+      google_reviews_url: data.google_reviews_url || null,
+      google_rating: data.google_rating ? Math.min(5, Math.max(0, Number(data.google_rating.replace(",", ".")) || 0)) : null,
+      google_reviews_count: data.google_reviews_count ? Math.max(0, Math.round(Number(data.google_reviews_count) || 0)) : null,
     })
     .eq("id", restaurant.id);
 

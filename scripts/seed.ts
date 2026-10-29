@@ -41,7 +41,7 @@ async function seed() {
     .from("restaurants")
     .insert({
       slug: RESTAURANT_SLUG,
-      is_published: true,
+      status: "active",
       name: "Chez Marius",
       tagline: "Cuisine provençale, produits du marché",
       description:

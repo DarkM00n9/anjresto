@@ -4,17 +4,12 @@ import { createServerClient } from "@supabase/ssr";
 
 const LOCAL_HOSTS = new Set(["localhost:3000", "127.0.0.1:3000"]);
 
-async function isPublishedSlug(slug: string): Promise<boolean> {
+async function restaurantSlugExists(slug: string): Promise<boolean> {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   );
-  const { data } = await supabase
-    .from("restaurants")
-    .select("slug")
-    .eq("slug", slug)
-    .eq("is_published", true)
-    .maybeSingle();
+  const { data } = await supabase.from("restaurants").select("slug").eq("slug", slug).maybeSingle();
   return data !== null;
 }
 
@@ -50,9 +45,9 @@ export async function proxy(request: NextRequest) {
 
     response = NextResponse.rewrite(url, { request: { headers: requestHeaders } });
 
-    // On ne mémorise le slug en cookie que s'il correspond à un restaurant publié,
+    // On ne mémorise le slug en cookie que s'il correspond à un restaurant existant,
     // pour ne pas "polluer" la navigation locale avec un slug invalide.
-    if (slug && (await isPublishedSlug(slug))) {
+    if (slug && (await restaurantSlugExists(slug))) {
       response.cookies.set("restaurant_slug", slug, { path: "/", sameSite: "lax" });
     }
   } else {

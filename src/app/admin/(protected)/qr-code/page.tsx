@@ -1,6 +1,7 @@
 import { requireCurrentRestaurant } from "@/lib/get-current-restaurant";
 import { buildPublicCarteUrl } from "@/lib/qr";
 import { QrCodeGenerator } from "@/components/admin/QrCodeGenerator";
+import { AdminPage, AdminPageHeader } from "@/components/admin/AdminPage";
 
 export default async function AdminQrCodePage() {
   const restaurant = await requireCurrentRestaurant();
@@ -8,11 +9,9 @@ export default async function AdminQrCodePage() {
   const carteUrl = buildPublicCarteUrl(restaurant, rootDomain);
 
   return (
-    <div>
-      <div className="border-b border-neutral-200 bg-white px-4 py-3">
-        <h1 className="text-base font-semibold text-neutral-900">QR code</h1>
-      </div>
+    <AdminPage width="narrow">
+      <AdminPageHeader title="QR code" description="Télécharge un QR code prêt à imprimer pour donner accès à ta carte." />
       <QrCodeGenerator restaurant={restaurant} carteUrl={carteUrl} />
-    </div>
+    </AdminPage>
   );
 }

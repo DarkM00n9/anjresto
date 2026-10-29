@@ -101,6 +101,9 @@ export const restaurantInfoSchema = z.object({
   logo_url: z.string().optional().or(z.literal("")),
   cover_image_url: z.string().optional().or(z.literal("")),
   gallery_urls: z.array(z.string()).max(4),
+  google_reviews_url: z.string().trim().max(500).optional().or(z.literal("")),
+  google_rating: z.string().trim().max(4).optional().or(z.literal("")),
+  google_reviews_count: z.string().trim().max(6).optional().or(z.literal("")),
 });
 export type RestaurantInfoInput = z.infer<typeof restaurantInfoSchema>;
 
@@ -119,7 +122,10 @@ export type ReservationFormValues = z.input<typeof reservationFormSchema>;
 
 export const reservationSettingsSchema = z.object({
   slot_interval_minutes: z.coerce.number().refine((v) => v === 15 || v === 30, "15 ou 30 minutes"),
-  max_covers_per_slot: z.coerce.number().int().min(1).max(500),
+  max_covers_per_slot: z.coerce.number().int().min(1, "Au moins 1").max(500),
+  total_seats: z.coerce.number().int().min(1, "Au moins 1 place").max(1000),
+  meal_duration_minutes: z.coerce.number().int().min(30, "Minimum 30 min").max(360, "Maximum 6 h"),
+  last_booking_before_close_minutes: z.coerce.number().int().min(0).max(240),
   max_party_size_online: z.coerce.number().int().min(1).max(50),
   min_advance_hours: z.coerce.number().int().min(0).max(168),
   max_advance_days: z.coerce.number().int().min(1).max(365),
@@ -145,3 +151,58 @@ export const closureSettingsSchema = z.object({
   closes_at: z.string().regex(/^\d{2}:\d{2}$/),
 });
 export type BlockedServiceInput = z.infer<typeof closureSettingsSchema>;
+
+// Phase 4 — superadmin
+
+export const createRestaurantSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().trim().min(1, "Nom requis").max(100),
+  slug: z
+    .string()
+    .trim()
+    .min(2, "Slug requis")
+    .max(60)
+    .regex(/^[a-z0-9-]+$/, "Lettres minuscules, chiffres et tirets uniquement"),
+  owner_email: z.string().trim().email("Email invalide"),
+  layout_style: z.enum(["bistrot_chaleureux", "moderne_epure", "mediterraneen"]),
+  primary_color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Couleur invalide (ex: #C8553D)"),
+  secondary_color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Couleur invalide (ex: #2E4057)"),
+  logo_url: z.string().optional().or(z.literal("")),
+});
+export type CreateRestaurantInput = z.infer<typeof createRestaurantSchema>;
+
+export const customDomainSchema = z.object({
+  custom_domain: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .regex(/^([a-z0-9-]+\.)+[a-z]{2,}$/, "Domaine invalide (ex: carte.monresto.fr)")
+    .optional()
+    .or(z.literal("")),
+});
+export type CustomDomainInput = z.infer<typeof customDomainSchema>;
+
+export const menuImportItemSchema = z.object({
+  name: z.string().trim().min(1, "Nom requis"),
+  description: z.string().trim().optional().or(z.literal("")),
+  price: z.coerce.number().min(0, "Prix invalide").max(999.99),
+});
+
+export const menuImportCategorySchema = z.object({
+  name: z.string().trim().min(1, "Nom requis"),
+  items: z.array(menuImportItemSchema).min(1, "Au moins un plat par catégorie"),
+});
+
+export const menuImportSchema = z.object({
+  categories: z.array(menuImportCategorySchema).min(1, "Au moins une catégorie"),
+});
+export type MenuImportInput = z.infer<typeof menuImportSchema>;
+export type MenuImportFormValues = z.input<typeof menuImportSchema>;
+
+export const waitlistSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date invalide"),
+  party_size: z.coerce.number().int().min(1).max(50),
+  name: z.string().trim().min(2, "Nom requis").max(80),
+  phone: z.string().trim().min(6, "Téléphone requis").max(30),
+  email: z.string().trim().email("E-mail invalide").or(z.literal("")),
+});

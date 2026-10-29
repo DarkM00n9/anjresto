@@ -5,6 +5,11 @@ import { useRouter } from "next/navigation";
 import type { OpeningHour } from "@/types/database";
 import { updateOpeningHours } from "@/app/admin/actions/hours";
 import type { DayScheduleInput } from "@/lib/schemas";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Toggle } from "@/components/ui/Toggle";
+import { Plus, Trash2 } from "lucide-react";
+import { IconButton } from "@/components/ui/IconButton";
 
 const DAY_LABELS = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 
@@ -76,47 +81,45 @@ export function HoursEditor({ hours }: { hours: OpeningHour[] }) {
   }
 
   return (
-    <div className="flex flex-col gap-3 px-4 py-6 sm:px-6">
+    <div className="space-y-4">
+      <div className="grid gap-3 md:grid-cols-2">
       {days.map((day) => (
-        <div key={day.day_of_week} className="rounded-2xl bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="font-semibold text-neutral-900">{DAY_LABELS[day.day_of_week]}</span>
-            <label className="flex items-center gap-2 text-sm text-neutral-600">
-              Fermé
-              <input
-                type="checkbox"
-                checked={day.is_closed}
-                onChange={() => toggleClosed(day.day_of_week)}
-                className="h-5 w-5 rounded"
-              />
-            </label>
+        <Card key={day.day_of_week} className="p-4 sm:p-5">
+          <div className="flex items-center justify-between gap-3">
+            <span className="font-semibold text-slate-900">{DAY_LABELS[day.day_of_week]}</span>
+            <Toggle
+              label="Fermé"
+              checked={day.is_closed}
+              onChange={() => toggleClosed(day.day_of_week)}
+              className="flex-row-reverse gap-2 text-xs"
+            />
           </div>
 
           {!day.is_closed && (
-            <div className="mt-3 flex flex-col gap-2">
+            <div className="mt-4 space-y-2.5">
               {day.slots.map((slot, i) => (
-                <div key={i} className="flex items-center gap-2">
+                <div key={i} className="flex items-center gap-2 rounded-xl bg-slate-100 p-2">
+                  <label className="sr-only" htmlFor={`hours-${day.day_of_week}-${i}-open`}>Ouverture, {DAY_LABELS[day.day_of_week]}</label>
                   <input
+                    id={`hours-${day.day_of_week}-${i}-open`}
                     type="time"
                     value={slot.opens_at}
                     onChange={(e) => updateSlot(day.day_of_week, i, "opens_at", e.target.value)}
-                    className="flex-1 rounded-lg border border-neutral-300 px-2 py-2 text-sm"
+                    className="min-h-10 min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-2 py-2 text-sm font-medium text-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/10"
                   />
-                  <span className="text-neutral-400">–</span>
+                  <span className="text-slate-700">à</span>
+                  <label className="sr-only" htmlFor={`hours-${day.day_of_week}-${i}-close`}>Fermeture, {DAY_LABELS[day.day_of_week]}</label>
                   <input
+                    id={`hours-${day.day_of_week}-${i}-close`}
                     type="time"
                     value={slot.closes_at}
                     onChange={(e) => updateSlot(day.day_of_week, i, "closes_at", e.target.value)}
-                    className="flex-1 rounded-lg border border-neutral-300 px-2 py-2 text-sm"
+                    className="min-h-10 min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-2 py-2 text-sm font-medium text-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/10"
                   />
                   {day.slots.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeSlot(day.day_of_week, i)}
-                      className="px-1 text-red-500"
-                    >
-                      ✕
-                    </button>
+                    <IconButton type="button" tone="danger" onClick={() => removeSlot(day.day_of_week, i)} aria-label={`Supprimer le service ${i + 1} du ${DAY_LABELS[day.day_of_week]}`}>
+                      <Trash2 className="h-4 w-4" />
+                    </IconButton>
                   )}
                 </div>
               ))}
@@ -124,24 +127,20 @@ export function HoursEditor({ hours }: { hours: OpeningHour[] }) {
                 <button
                   type="button"
                   onClick={() => addSlot(day.day_of_week)}
-                  className="self-start text-xs font-medium text-neutral-500 underline"
+                  className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-50"
                 >
-                  + Ajouter un service (midi/soir)
+                  <Plus className="h-3.5 w-3.5" /> Ajouter un service
                 </button>
               )}
             </div>
           )}
-        </div>
+        </Card>
       ))}
+      </div>
 
-      <button
-        type="button"
-        onClick={handleSave}
-        disabled={isPending}
-        className="mt-2 w-full rounded-xl bg-neutral-900 px-4 py-4 text-lg font-semibold text-white disabled:opacity-50"
-      >
-        {isPending ? "Enregistrement..." : saved ? "Enregistré ✓" : "Enregistrer les horaires"}
-      </button>
+      <Button type="button" variant="accent" size="lg" onClick={handleSave} loading={isPending} className="w-full">
+        {saved ? "Horaires enregistrés" : "Enregistrer les horaires"}
+      </Button>
     </div>
   );
 }
