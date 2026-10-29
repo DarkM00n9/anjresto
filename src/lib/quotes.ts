@@ -43,6 +43,12 @@ export interface Quote {
   delivery_days: number;
   notes: string | null;
   status: QuoteStatus;
+  public_token: string;
+  sent_at: string | null;
+  signature_data: string | null;
+  signed_name: string | null;
+  signed_at: string | null;
+  signed_method: "in_person" | "remote" | null;
 }
 
 export const QUOTE_STATUS_LABEL: Record<QuoteStatus, string> = {
@@ -90,4 +96,8 @@ export function formatEUR(n: number) {
 
 export function formatDateFR(date: string | null) {
   return date ? date.split("-").reverse().join("/") : "";
+}
+
+export function formatDateTimeFR(iso: string) {
+  return new Date(iso).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Paris" });
 }

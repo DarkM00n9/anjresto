@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { requireSuperadmin } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { QuoteLine, QuoteStatus } from "@/lib/quotes";
+import { sendEmailStrict } from "@/lib/email/resend";
+import { quoteEmail } from "@/lib/email/quote-email";
+import { quoteLink } from "@/lib/quote-link";
+import type { CompanySettings, Quote, QuoteLine, QuoteStatus } from "@/lib/quotes";
 
 const text = (v: unknown, max = 500) => {
   const s = String(v ?? "").trim().slice(0, max);
@@ -129,4 +132,34 @@ export async function deleteQuote(id: string) {
   const { error } = await createAdminClient().from("quotes").delete().eq("id", id);
   revalidatePath("/superadmin/devis");
   return { success: !error };
+}
+
+/** Envoie le devis par email avec un lien pour le consulter et le signer en ligne. */
+export async function sendQuoteEmail(id: string) {
+  await requireSuperadmin();
+  const admin = createAdminClient();
+  const [{ data: quote }, { data: company }] = await Promise.all([
+    admin.from("quotes").select("*").eq("id", id).maybeSingle(),
+    admin.from("company_settings").select("*").eq("id", 1).maybeSingle(),
+  ]);
+  if (!quote || !company) return { success: false, error: "Devis introuvable." };
+  const q = quote as Quote;
+  if (!q.client_email) return { success: false, error: "Ce devis n'a pas d'email client." };
+  if (q.status === "signed") return { success: false, error: "Ce devis est déjà signé." };
+
+  const link = await quoteLink(q.public_token);
+  const mail = quoteEmail(q, company as CompanySettings, link);
+  const res = await sendEmailStrict({ to: q.client_email, ...mail, replyTo: (company as CompanySettings).email ?? undefined });
+  if (!res.ok) return { success: false, error: `Envoi impossible : ${res.error}` };
+
+  await admin.from("quotes").update({ sent_at: new Date().toISOString(), status: q.status === "draft" ? "sent" : q.status }).eq("id", id);
+  revalidatePath("/superadmin/devis");
+  revalidatePath(`/superadmin/devis/${id}`);
+  return { success: true };
+}
+
+export async function getQuoteLink(id: string) {
+  await requireSuperadmin();
+  const { data } = await createAdminClient().from("quotes").select("public_token").eq("id", id).maybeSingle();
+  return data ? await quoteLink(data.public_token as string) : null;
 }

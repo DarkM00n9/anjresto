@@ -1,4 +1,4 @@
-import { computeTotals, formatDateFR, formatEUR, type CompanySettings, type Quote } from "@/lib/quotes";
+import { computeTotals, formatDateFR, formatDateTimeFR, formatEUR, type CompanySettings, type Quote } from "@/lib/quotes";
 
 /** Devis prêt à imprimer (le menu du superadmin est masqué à l'impression). */
 export function QuoteDocument({ quote, company }: { quote: Quote; company: CompanySettings }) {
@@ -106,7 +106,21 @@ export function QuoteDocument({ quote, company }: { quote: Quote; company: Compa
         <p className="text-xs text-slate-600">Date, mention « Bon pour accord » et signature.</p>
         <div className="mt-2 grid grid-cols-2 gap-4">
           <div className="h-28 rounded-xl border border-slate-300 p-3 text-xs text-slate-600">{company.legal_name}</div>
-          <div className="h-28 rounded-xl border border-slate-300 p-3 text-xs text-slate-600">Le client</div>
+          <div className="min-h-28 rounded-xl border border-slate-300 p-3 text-xs text-slate-600">
+            {quote.signature_data ? (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={quote.signature_data} alt={`Signature de ${quote.signed_name ?? "le client"}`} className="h-16 w-auto" />
+                <p className="mt-1 text-slate-800">
+                  Signé par <strong>{quote.signed_name}</strong>
+                  {quote.signed_at && <> le {formatDateTimeFR(quote.signed_at)}</>}
+                </p>
+                <p className="text-[11px]">Bon pour accord ({quote.signed_method === "in_person" ? "signature sur place" : "signature en ligne"})</p>
+              </>
+            ) : (
+              "Le client"
+            )}
+          </div>
         </div>
       </section>
 
