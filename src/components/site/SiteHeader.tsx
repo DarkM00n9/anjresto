@@ -6,7 +6,10 @@ import { ArrowUpRight } from "lucide-react";
 import { getT } from "@/lib/lang";
 import { LangSwitch } from "./LangSwitch";
 
-export async function SiteHeader({ restaurant }: { restaurant: Restaurant }) {
+export async function SiteHeader({ restaurant, modern = false }: { restaurant: Restaurant; modern?: boolean }) {
+  const navLink = modern
+    ? "rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-700 transition-colors hover:bg-[var(--color-primary)]/10 hover:text-[var(--color-primary)]"
+    : "text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-600 transition-colors hover:text-[var(--color-primary)]";
   const t = await getT();
   return (
     <header className="sticky top-0 z-40 border-b border-black/[0.07] bg-white/95 backdrop-blur-xl">
@@ -23,10 +26,10 @@ export async function SiteHeader({ restaurant }: { restaurant: Restaurant }) {
           )}
           <span className="truncate font-[family-name:var(--font-title)] text-base font-medium tracking-tight text-[var(--color-secondary)] sm:text-lg">{restaurant.name}</span>
         </Link>
-        <nav aria-label={t("Navigation principale")} className="hidden items-center gap-8 md:flex">
-          <Link href="/carte" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-600 transition-colors hover:text-[var(--color-primary)]">{t("La carte")}</Link>
-          <Link href="/#horaires" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-600 transition-colors hover:text-[var(--color-primary)]">{t("Horaires")}</Link>
-          <Link href="/#adresse" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-600 transition-colors hover:text-[var(--color-primary)]">{t("Nous trouver")}</Link>
+        <nav aria-label={t("Navigation principale")} className="hidden items-center gap-2 md:flex">
+          <Link href="/carte" className={navLink}>{t("La carte")}</Link>
+          <Link href="/#horaires" className={navLink}>{t("Horaires")}</Link>
+          <Link href="/#adresse" className={navLink}>{t("Nous trouver")}</Link>
         </nav>
         <div className="flex shrink-0 items-center gap-3">
           <LangSwitch />

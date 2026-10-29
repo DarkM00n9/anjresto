@@ -8,6 +8,7 @@ import { DemoBanner } from "@/components/site/DemoBanner";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { LangProvider } from "@/components/site/LangProvider";
 import { getLang } from "@/lib/lang";
+import { getLayoutPreset } from "@/lib/layout-presets";
 import { SuspendedPage } from "@/components/site/SuspendedPage";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -27,6 +28,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   }
 
   const lang = await getLang();
+  const modern = getLayoutPreset(restaurant.theme.layout_style).heroVariant === "diagonal";
   const font = resolveTitleFont(restaurant.theme.font_title);
 
   return (
@@ -34,9 +36,9 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <LangProvider lang={lang}>
       <ScrollProgress />
       {restaurant.status === "demo" && <DemoBanner />}
-      <SiteHeader restaurant={restaurant} />
+      <SiteHeader restaurant={restaurant} modern={modern} />
       {children}
-      <SiteFooter restaurant={restaurant} />
+      <SiteFooter restaurant={restaurant} modern={modern} />
       </LangProvider>
     </div>
   );

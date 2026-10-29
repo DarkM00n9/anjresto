@@ -9,6 +9,7 @@ import { MenuPreview } from "@/components/site/MenuPreview";
 import { OpeningHoursBlock } from "@/components/site/OpeningHoursBlock";
 import { LocationMap } from "@/components/site/LocationMap";
 import { ContactSection } from "@/components/site/ContactSection";
+import { ModernAbout, ModernContact, ModernHours, ModernLocation, ModernMenu } from "@/components/site/modern/ModernSections";
 
 export default async function HomePage() {
   const restaurant = await requireCurrentRestaurant();
@@ -23,6 +24,8 @@ export default async function HomePage() {
 
   const jsonLd = buildRestaurantJsonLd(restaurant, baseUrl, hours);
 
+  const modern = preset.heroVariant === "diagonal";
+
   return (
     <>
       <script
@@ -30,11 +33,23 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Hero restaurant={restaurant} preset={preset} />
+      {modern ? (
+        <>
+          <Reveal><ModernAbout restaurant={restaurant} /></Reveal>
+          <ModernMenu categories={categories} items={items} />
+          <Reveal><ModernHours hours={hours} closures={closures} restaurant={restaurant} /></Reveal>
+          <Reveal><ModernLocation restaurant={restaurant} /></Reveal>
+          <Reveal><ModernContact restaurant={restaurant} /></Reveal>
+        </>
+      ) : (
+        <>
       <Reveal><About restaurant={restaurant} preset={preset} /></Reveal>
       <Reveal><MenuPreview categories={categories} items={items} /></Reveal>
       <Reveal><OpeningHoursBlock hours={hours} closures={closures} /></Reveal>
       <Reveal><LocationMap restaurant={restaurant} preset={preset} /></Reveal>
       <Reveal><ContactSection restaurant={restaurant} /></Reveal>
+        </>
+      )}
     </>
   );
 }

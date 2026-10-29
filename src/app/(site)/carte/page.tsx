@@ -8,6 +8,7 @@ import { DailySpecialBanner } from "@/components/carte/DailySpecialBanner";
 import { DailyMenuBanner } from "@/components/carte/DailyMenuBanner";
 import { ButtonLink } from "@/components/ui/Button";
 import { ArrowUpRight } from "lucide-react";
+import { getLayoutPreset } from "@/lib/layout-presets";
 import { getT, getLocalize } from "@/lib/lang";
 
 
@@ -31,6 +32,7 @@ export default async function CartePage() {
   ]);
 
   const sortedCategories = [...categories].sort((a, b) => a.display_order - b.display_order);
+  const modern = getLayoutPreset(restaurant.theme.layout_style).heroVariant === "diagonal";
   const jsonLd = buildMenuJsonLd(restaurant, categories, items, baseUrl);
 
   return (
@@ -39,7 +41,8 @@ export default async function CartePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <section className="bg-stone-200 px-4 py-14 sm:py-20">
+      <section className={modern ? "relative isolate overflow-hidden bg-stone-50 px-4 py-14 sm:py-20" : "bg-stone-200 px-4 py-14 sm:py-20"}>
+        {modern && <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[var(--color-secondary)] [clip-path:polygon(78%_0,100%_0,100%_100%,60%_100%)]" />}
         <div className="mx-auto grid max-w-6xl items-end gap-8 md:grid-cols-[1fr_auto]">
           <div>
             <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-primary)]">
@@ -51,12 +54,12 @@ export default async function CartePage() {
             {restaurant.tagline && <p className="mt-4 max-w-xl text-base leading-7 text-stone-700">{L(restaurant.tagline, restaurant.tagline_en)}</p>}
           </div>
           <div className="flex flex-col items-start gap-3 border-l border-black/10 pl-5 md:items-end md:border-l-0 md:pl-0">
-            {restaurant.cuisine_type && <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-600">{restaurant.cuisine_type}</p>}
-            <ButtonLink href="/reservation" variant="outline" size="sm" icon={<ArrowUpRight className="h-3.5 w-3.5" />}>{t("Réserver une table")}</ButtonLink>
+            {restaurant.cuisine_type && <p className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${modern ? "text-white/85" : "text-stone-600"}`}>{restaurant.cuisine_type}</p>}
+            <ButtonLink href="/reservation" variant={modern ? "primary" : "outline"} size="sm" icon={<ArrowUpRight className="h-3.5 w-3.5" />}>{t("Réserver une table")}</ButtonLink>
           </div>
         </div>
       </section>
-      <CategoryTabs categories={sortedCategories} />
+      <CategoryTabs categories={sortedCategories} modern={modern} />
       <DailyMenuBanner dailyMenu={dailyMenu} />
       <DailySpecialBanner items={items} />
       <CarteList categories={sortedCategories} items={items} />

@@ -5,7 +5,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { getT, getLocalize } from "@/lib/lang";
 
 
-export async function SiteFooter({ restaurant }: { restaurant: Restaurant }) {
+export async function SiteFooter({ restaurant, modern = false }: { restaurant: Restaurant; modern?: boolean }) {
   const t = await getT();
   const L = await getLocalize();
   const address = [restaurant.address_line, restaurant.postal_code, restaurant.city]
@@ -13,7 +13,7 @@ export async function SiteFooter({ restaurant }: { restaurant: Restaurant }) {
     .join(", ");
 
   return (
-    <footer className="bg-[#1d1c19] text-stone-100">
+    <footer className={modern ? "bg-[var(--color-secondary)] text-stone-100 [clip-path:polygon(0_4%,100%_0,100%_100%,0_100%)] pt-8 md:pt-12" : "bg-[#1d1c19] text-stone-100"}>
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.2fr_0.8fr_0.7fr] md:gap-12 md:py-20 lg:px-8">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">{t("La maison")}</p>
