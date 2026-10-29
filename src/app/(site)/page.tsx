@@ -21,7 +21,7 @@ export default async function HomePage() {
     getBaseUrl(),
   ]);
 
-  const jsonLd = buildRestaurantJsonLd(restaurant, baseUrl);
+  const jsonLd = buildRestaurantJsonLd(restaurant, baseUrl, hours);
 
   return (
     <>

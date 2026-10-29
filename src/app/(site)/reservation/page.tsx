@@ -11,7 +11,11 @@ import { getT } from "@/lib/lang";
 
 export async function generateMetadata(): Promise<Metadata> {
   const restaurant = await requireCurrentRestaurant();
-  return { title: `Réserver une table — ${restaurant.name}` };
+  return {
+    title: `Réserver une table — ${restaurant.name}`,
+    description: `Réservez en ligne votre table chez ${restaurant.name}${restaurant.city ? ` à ${restaurant.city}` : ""}, sans frais.`,
+    alternates: { canonical: "/reservation" },
+  };
 }
 
 export default async function ReservationPage() {

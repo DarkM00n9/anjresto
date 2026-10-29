@@ -13,7 +13,11 @@ import { getT, getLocalize } from "@/lib/lang";
 
 export async function generateMetadata(): Promise<Metadata> {
   const restaurant = await requireCurrentRestaurant();
-  return { title: `Carte — ${restaurant.name}` };
+  return {
+    title: `Carte — ${restaurant.name}`,
+    description: `La carte de ${restaurant.name}${restaurant.city ? ` à ${restaurant.city}` : ""} : plats, menu du jour et allergènes.`,
+    alternates: { canonical: "/carte" },
+  };
 }
 
 export default async function CartePage() {

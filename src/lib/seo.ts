@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import type { Category, MenuItem, Restaurant } from "@/types/database";
+import type { Category, MenuItem, OpeningHour, Restaurant } from "@/types/database";
 
 export function buildRestaurantMetadata(
   restaurant: Restaurant,
@@ -15,6 +15,7 @@ export function buildRestaurantMetadata(
   return {
     title,
     description,
+    robots: restaurant.status === "active" ? undefined : { index: false, follow: false },
     alternates: { canonical: baseUrl },
     openGraph: {
       title,
@@ -34,7 +35,9 @@ export function buildRestaurantMetadata(
   };
 }
 
-export function buildRestaurantJsonLd(restaurant: Restaurant, baseUrl: string) {
+const SCHEMA_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+export function buildRestaurantJsonLd(restaurant: Restaurant, baseUrl: string, hours: OpeningHour[] = []) {
   return {
     "@context": "https://schema.org",
     "@type": "Restaurant",
@@ -58,6 +61,25 @@ export function buildRestaurantJsonLd(restaurant: Restaurant, baseUrl: string) {
             "@type": "GeoCoordinates",
             latitude: restaurant.latitude,
             longitude: restaurant.longitude,
+          }
+        : undefined,
+    email: restaurant.email ?? undefined,
+    logo: restaurant.logo_url ?? undefined,
+    acceptsReservations: `${baseUrl}/reservation`,
+    openingHoursSpecification: hours
+      .filter((h) => !h.is_closed && h.opens_at && h.closes_at)
+      .map((h) => ({
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: SCHEMA_DAYS[h.day_of_week],
+        opens: h.opens_at!.slice(0, 5),
+        closes: h.closes_at!.slice(0, 5),
+      })),
+    aggregateRating:
+      restaurant.google_rating && restaurant.google_reviews_count
+        ? {
+            "@type": "AggregateRating",
+            ratingValue: restaurant.google_rating,
+            reviewCount: restaurant.google_reviews_count,
           }
         : undefined,
     sameAs: [restaurant.instagram_url, restaurant.facebook_url].filter(Boolean),
