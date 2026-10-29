@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Devis — Site de réservation pour restaurant</title>
+<style>
+  :root { --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --accent:#c2523a; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.6 -apple-system,"Segoe UI",Roboto,sans-serif; color:var(--ink); background:#fff; }
+  .page { max-width:760px; margin:0 auto; padding:32px 20px 60px; }
+  h1 { font-size:26px; margin:0 0 4px; }
+  h2 { font-size:13px; text-transform:uppercase; letter-spacing:.14em; color:var(--accent); margin:32px 0 10px; }
+  .muted { color:var(--muted); }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:560px){ .row { grid-template-columns:1fr; } }
+  .box { border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
+  .fill { border-bottom:1px dashed #9ca3af; display:inline-block; min-width:150px; }
+  table { width:100%; border-collapse:collapse; }
+  th,td { text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  td.r, th.r { text-align:right; white-space:nowrap; }
+  ul { margin:6px 0 0; padding-left:20px; }
+  .total td { font-weight:700; border-bottom:0; }
+  .sign { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:12px; }
+  .sign .box { height:120px; }
+  .small { font-size:12.5px; }
+  @media print { .page { padding:0; } .noprint { display:none; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <p class="noprint small muted">Modèle à compléter : remplace les champs soulignés, puis imprime ou « Enregistrer en PDF ».</p>
+
+  <h1>Devis n° <span class="fill">2026-001</span></h1>
+  <p class="muted">Date : <span class="fill">__ / __ / 2026</span> — Valable 30 jours</p>
+
+  <div class="row">
+    <div class="box">
+      <strong>Prestataire</strong><br>
+      ANJ Agency — <span class="fill">Nom et prénom</span><br>
+      Marseille<br>
+      SIRET : <span class="fill">…………………</span><br>
+      Email / tél. : <span class="fill">…………………</span>
+    </div>
+    <div class="box">
+      <strong>Client</strong><br>
+      Restaurant : <span class="fill">…………………</span><br>
+      Représentant : <span class="fill">…………………</span><br>
+      Adresse : <span class="fill">…………………</span><br>
+      Email / tél. : <span class="fill">…………………</span>
+    </div>
+  </div>
+
+  <h2>Prestation</h2>
+  <table>
+    <thead><tr><th>Désignation</th><th class="r">Prix</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>
+          <strong>Création du site du restaurant</strong>
+          <ul>
+            <li>Site vitrine adapté au mobile : accueil, carte avec photos et allergènes, horaires, accès</li>
+            <li>Réservation en ligne avec confirmations et rappels par email</li>
+            <li>Espace d'administration pour gérer réservations, carte et horaires</li>
+            <li>Version française et anglaise</li>
+            <li>Mise en ligne, configuration et prise en main</li>
+          </ul>
+        </td>
+        <td class="r">1 000 €</td>
+      </tr>
+      <tr class="total"><td>Total création</td><td class="r">1 000 €</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Modalités de paiement</h2>
+  <table>
+    <tbody>
+      <tr><td>Acompte de 40 % à la signature</td><td class="r">400 €</td></tr>
+      <tr><td>Solde de 60 % à la livraison</td><td class="r">600 €</td></tr>
+    </tbody>
+  </table>
+  <p class="small muted">Paiement par virement bancaire ou lien de paiement. Une facture est remise pour chaque règlement. <span class="fill">Mention de TVA selon ton statut</span></p>
+
+  <h2>Abonnement mensuel</h2>
+  <div class="box">
+    <strong>39 € par mois</strong>, à partir de la mise en ligne. Sans engagement de durée, résiliable à tout moment avec un préavis de 30 jours.
+    <ul>
+      <li>Hébergement et sécurité du site</li>
+      <li>Emails de réservation (confirmation, rappel, annulation)</li>
+      <li>Support par email ou téléphone</li>
+      <li>Jusqu'à 3 modifications simples par mois (carte, horaires, photos)</li>
+    </ul>
+    <p class="small muted" style="margin:8px 0 0">Les modifications supplémentaires ou les demandes sur mesure font l'objet d'un devis séparé.</p>
+  </div>
+
+  <h2>Délais et conditions</h2>
+  <ul class="small">
+    <li>Livraison sous <span class="fill">5</span> jours ouvrés après réception de l'acompte et des éléments du restaurant (logo, photos, carte, horaires).</li>
+    <li>Les contenus fournis par le restaurant restent sa propriété et il garantit en détenir les droits.</li>
+    <li>L'acompte n'est pas remboursable une fois le travail commencé.</li>
+    <li>Le nom de domaine personnalisé (par exemple monrestaurant.fr) n'est pas inclus : prix selon le domaine choisi.</li>
+  </ul>
+
+  <h2>Bon pour accord</h2>
+  <p class="small">Date et mention « Bon pour accord » suivies de la signature.</p>
+  <div class="sign">
+    <div class="box"><span class="small muted">Le prestataire</span></div>
+    <div class="box"><span class="small muted">Le client</span></div>
+  </div>
+</div>
+</body>
+</html>
