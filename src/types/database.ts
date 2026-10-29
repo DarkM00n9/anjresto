@@ -22,7 +22,8 @@ export type Allergen =
 export type LayoutStyle =
   | "bistrot_chaleureux"
   | "moderne_epure"
-  | "mediterraneen";
+  | "mediterraneen"
+  | "diagonale";
 
 export type RestaurantStatus = "demo" | "active" | "suspended";
 

@@ -237,3 +237,19 @@ export async function duplicateRestaurant(sourceId: string, newSlug: string, new
   revalidatePath("/superadmin");
   return { success: true, restaurantId: created.id as string };
 }
+
+export async function updateLayoutStyle(restaurantId: string, style: string) {
+  await requireSuperadmin();
+  const parsed = createRestaurantSchema.shape.layout_style.safeParse(style);
+  if (!parsed.success) return { success: false, error: "Style inconnu." };
+  const admin = createAdminClient();
+  const { data: restaurant } = await admin.from("restaurants").select("theme").eq("id", restaurantId).maybeSingle();
+  if (!restaurant) return { success: false, error: "Restaurant introuvable." };
+  const { error } = await admin
+    .from("restaurants")
+    .update({ theme: { ...restaurant.theme, layout_style: parsed.data } })
+    .eq("id", restaurantId);
+  if (error) return { success: false, error: "Impossible d'enregistrer." };
+  revalidatePath("/", "layout");
+  return { success: true };
+}

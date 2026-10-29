@@ -18,7 +18,7 @@ export async function SiteHeader({ restaurant }: { restaurant: Restaurant }) {
               alt=""
               width={32}
               height={32}
-              className="h-10 w-10 rounded-full object-cover ring-1 ring-black/10"
+              className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-black/10"
             />
           )}
           <span className="truncate font-[family-name:var(--font-title)] text-base font-medium tracking-tight text-[var(--color-secondary)] sm:text-lg">{restaurant.name}</span>
@@ -30,7 +30,6 @@ export async function SiteHeader({ restaurant }: { restaurant: Restaurant }) {
         </nav>
         <div className="flex shrink-0 items-center gap-3">
           <LangSwitch />
-          <Link href="/carte" className="text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-700 md:hidden">{t("La carte")}</Link>
           <ButtonLink href="/reservation" size="sm" className="px-4 sm:px-5" icon={<ArrowUpRight className="h-3.5 w-3.5" />}>{t("Réserver")}</ButtonLink>
         </div>
       </div>

@@ -4,6 +4,7 @@ import type { LayoutPreset } from "@/lib/layout-presets";
 import { ButtonLink } from "@/components/ui/Button";
 import { ArrowDown, MapPin } from "lucide-react";
 import { GoogleReviews } from "./GoogleReviews";
+import { HeroDiagonal } from "./HeroDiagonal";
 import { getT, getLocalize } from "@/lib/lang";
 
 
@@ -15,6 +16,7 @@ interface HeroProps {
 export async function Hero({ restaurant, preset }: HeroProps) {
   const t = await getT();
   const L = await getLocalize();
+  if (preset.heroVariant === "diagonal") return <HeroDiagonal restaurant={restaurant} />;
   return (
     <section className="relative isolate flex min-h-[min(900px,calc(100svh-64px))] items-center justify-center overflow-hidden text-white">
       {restaurant.cover_image_url ? (

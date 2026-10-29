@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getRestaurantOverview } from "@/lib/superadmin/get-restaurants-overview";
 import { RestaurantStatusActions } from "@/components/superadmin/RestaurantStatusActions";
 import { CustomDomainForm } from "@/components/superadmin/CustomDomainForm";
+import { LayoutStyleForm } from "@/components/superadmin/LayoutStyleForm";
 import { BillingForm } from "@/components/superadmin/BillingForm";
 import { DuplicateForm } from "@/components/superadmin/DuplicateForm";
 import { AdminPage, AdminPageHeader, AdminPanel } from "@/components/admin/AdminPage";
@@ -50,6 +51,11 @@ export default async function RestaurantDetailPage({
             Importer une carte
           </ButtonLink>
         </div>
+      </section>
+
+      <section className="mt-7">
+        <h2 className="mb-3 text-sm font-semibold text-slate-800">Apparence</h2>
+        <LayoutStyleForm restaurantId={restaurant.id} current={restaurant.theme.layout_style} />
       </section>
 
       <section className="mt-7">

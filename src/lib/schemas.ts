@@ -164,7 +164,7 @@ export const createRestaurantSchema = z.object({
     .max(60)
     .regex(/^[a-z0-9-]+$/, "Lettres minuscules, chiffres et tirets uniquement"),
   owner_email: z.string().trim().email("Email invalide"),
-  layout_style: z.enum(["bistrot_chaleureux", "moderne_epure", "mediterraneen"]),
+  layout_style: z.enum(["bistrot_chaleureux", "moderne_epure", "mediterraneen", "diagonale"]),
   primary_color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Couleur invalide (ex: #C8553D)"),
   secondary_color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Couleur invalide (ex: #2E4057)"),
   logo_url: z.string().optional().or(z.literal("")),

@@ -16,6 +16,7 @@ const LAYOUT_STYLES = [
   { value: "bistrot_chaleureux", label: "Bistrot chaleureux" },
   { value: "moderne_epure", label: "Moderne épuré" },
   { value: "mediterraneen", label: "Méditerranéen" },
+  { value: "diagonale", label: "Moderne diagonale" },
 ] as const;
 
 function slugify(value: string): string {
