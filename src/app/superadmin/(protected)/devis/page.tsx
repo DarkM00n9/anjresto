@@ -31,7 +31,7 @@ export default async function QuotesPage() {
         backLabel="Restaurants"
         action={
           <div className="flex gap-2">
-            <ButtonLink href="/superadmin/societe" variant="outline" icon={<Building2 className="h-4 w-4" />}>Ma société</ButtonLink>
+            <ButtonLink href="/superadmin/societe" variant="outline-accent" icon={<Building2 className="h-4 w-4" />}>Ma société</ButtonLink>
             <ButtonLink href="/superadmin/devis/nouveau" variant="accent" icon={<FilePlus2 className="h-4 w-4" />}>Nouveau devis</ButtonLink>
           </div>
         }

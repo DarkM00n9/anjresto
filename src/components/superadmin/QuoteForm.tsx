@@ -107,7 +107,7 @@ export function QuoteForm({ restaurants }: { restaurants: RestaurantOption[] }) 
             )}
           </div>
         ))}
-        <Button type="button" variant="outline" size="sm" icon={<Plus className="h-4 w-4" />} onClick={() => setLines([...lines, { label: "", description: "", quantity: "1", unit_price: "0" }])}>
+        <Button type="button" variant="outline-accent" size="sm" icon={<Plus className="h-4 w-4" />} onClick={() => setLines([...lines, { label: "", description: "", quantity: "1", unit_price: "0" }])}>
           Ajouter une ligne
         </Button>
       </Card>

@@ -18,7 +18,7 @@ export function SuperadminShell({ children }: PropsWithChildren) {
           </span>
         </Link>
         <div className="flex items-center gap-2">
-          <ButtonLink href="/superadmin/devis" variant="outline" size="sm" icon={<FileText className="h-4 w-4" />}>Devis</ButtonLink>
+          <ButtonLink href="/superadmin/devis" variant="outline-white" size="sm" icon={<FileText className="h-4 w-4" />}>Devis</ButtonLink>
           <ButtonLink href="/superadmin/nouveau" variant="accent" size="sm" icon={<Plus className="h-4 w-4" />}><span className="hidden sm:inline">Nouveau restaurant</span><span className="sm:hidden">Nouveau</span></ButtonLink>
           <SignOutButton redirectTo="/superadmin/login" tone="dark" />
         </div>
